@@ -4,6 +4,7 @@ package amdp.rmaxq.framework;
 
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.oo.OOSADomain;
 
 import java.util.List;
 
@@ -14,11 +15,12 @@ import java.util.List;
 public interface TaskNode {
     String getName();
     boolean isTaskPrimitive();
-    boolean terminal(State s, Action action);
+    boolean terminal(State s, Action a);
 
     // here each grounded task comes with a fake action that we create
     public List<GroundedTask> getApplicableGroundedTasks(State s);
 
     public String name();
 
+    public OOSADomain getDomain();
 }

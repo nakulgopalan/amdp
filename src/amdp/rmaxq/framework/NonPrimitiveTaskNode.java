@@ -3,6 +3,7 @@ package amdp.rmaxq.framework;
 
 import burlap.behavior.policy.Policy;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.statehashing.HashableState;
 
 /**
@@ -13,12 +14,14 @@ import burlap.statehashing.HashableState;
 public abstract class NonPrimitiveTaskNode implements TaskNode{
 
     protected TaskNode[] taskNodes;
-
     protected Policy policy;
-
     protected String name;
-
-
+    protected OOSADomain domain;
+    
+    public OOSADomain getDomain(){
+    	return domain;
+    }
+    
     public boolean isTaskPrimitive(){
         return false;
     }

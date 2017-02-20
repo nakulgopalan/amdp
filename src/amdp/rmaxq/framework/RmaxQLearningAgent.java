@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import amdp.maxq.framework.QProviderForMAXQ;
 import amdp.rmaxq.framework.RmaxQLearningAgent.StateTransition;
+import amdp.utilities.BoltzmannQPolicyWithCoolingSchedule;
+import burlap.behavior.policy.SolverDerivedPolicy;
 import burlap.behavior.singleagent.Episode;
+import burlap.behavior.singleagent.auxiliary.StateReachability;
 import burlap.behavior.singleagent.learning.LearningAgent;
 import burlap.behavior.valuefunction.QProvider;
+import burlap.behavior.valuefunction.QValue;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.environment.Environment;
@@ -42,8 +47,14 @@ public class RmaxQLearningAgent implements LearningAgent {
 	//n(s,a,s')
 	private Map<HashableState, Map< GroundedTask, Map<HashableState, Integer>>> resultingStateCount;
 	
+	//grounded task map
+	private Map<String, GroundedTask> groundedTaskMap;
+	
 	//QProviders for each grounded task
-	private Map<GroundedTask, QProvider> qPolicy;
+	private Map<GroundedTask, QProviderRmaxQ> qProvider;
+	
+	//policies
+	private Map<GroundedTask, SolverDerivedPolicy> qPolicy;
 	
 	//t
 	private int timestamp;
@@ -51,12 +62,16 @@ public class RmaxQLearningAgent implements LearningAgent {
 	//envolope(a)
 	private Map<GroundedTask, List<State>> envolope;
 	
+	//ta 
+	private Map<GroundedTask, List<State>> terminal;
+	
 	private double dynamicPrgEpsilon;
 	private int threshold;
 	private TaskNode root;
 	private HashableStateFactory hashingFactory;
 	private double Vmax;
 	private Environment env;
+	private State initialState;
 	
 	public RmaxQLearningAgent(TaskNode root, HashableStateFactory hs, double vmax, int threshold, double maxDelta){
 //		this.qValue = new HashMap<GroundedTask, Map<HashableState,Map<GroundedTask,Double>>>();
@@ -68,9 +83,12 @@ public class RmaxQLearningAgent implements LearningAgent {
 		this.reward = new HashMap<GroundedTask, Map<HashableState,Double>>();
 		this.totalReward = new HashMap<HashableState, Map<GroundedTask,Double>>();
 		this.actionCount = new HashMap<HashableState, Map<GroundedTask,Integer>>();
-		this.qPolicy = new HashMap<GroundedTask, QProvider>();
+		this.qProvider = new HashMap<GroundedTask, QProviderRmaxQ>();
 		this.envolope = new HashMap<GroundedTask, List<State>>();
 		this.resultingStateCount = new HashMap<HashableState, Map<GroundedTask,Map<HashableState,Integer>>>();
+		this.terminal = new HashMap<GroundedTask, List<State>>();
+		this.qPolicy = new HashMap<GroundedTask, SolverDerivedPolicy>();
+		this.groundedTaskMap = new HashMap<String, GroundedTask>();
 		this.dynamicPrgEpsilon = maxDelta;
 		this.timestamp = 0;
 		this.hashingFactory = hs;
@@ -84,6 +102,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 
 	public Episode runLearningEpisode(Environment env, int maxSteps) {
 		this.env = env;
+		this.initialState = env.currentObservation();
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
 		return R_MaxQ(env.currentObservation(), rootSolve, e);
@@ -234,10 +253,143 @@ public class RmaxQLearningAgent implements LearningAgent {
 						reward.get(task).put(hsprime, Vmax);
 					double prevReward = reward.get(task).get(hsprime);
 					
+					// calculate new reward
+					//get qprovider
+					if(!qProvider.containsKey(task))
+						qProvider.put(task, new QProviderRmaxQ(hashingFactory));
+					QProviderRmaxQ qvalues = qProvider.get(task);
+					
+					if(!qPolicy.containsKey(task))
+						qPolicy.put(task, new BoltzmannQPolicyWithCoolingSchedule(50, 0.99879));
+					SolverDerivedPolicy taskFromPolicy = qPolicy.get(task);
+					taskFromPolicy.setSolver(qvalues);
+					Action maxqAction = taskFromPolicy.action(sprime);
+					if(!groundedTaskMap.containsKey(maxqAction.actionName()))
+						addChildTasks(task);
+					
+					//R pia(s') (s')
+					GroundedTask childFromPolicy = groundedTaskMap.get(maxqAction.actionName());
+					if(!reward.containsKey(childFromPolicy))
+						reward.put(childFromPolicy, new HashMap<HashableState, Double>());
+					if(!reward.get(childFromPolicy).containsKey(hsprime))
+						reward.get(childFromPolicy).put(hsprime, Vmax);
+					double actionReward = reward.get(childFromPolicy).get(hsprime);
+					
+					//p pia(s') (s',.)
+					if(!transition.containsKey(childFromPolicy))
+						transition.put(childFromPolicy, new HashMap<HashableState, List<StateTransition>>());
+					if(!transition.get(childFromPolicy).containsKey(hsprime))
+						transition.get(childFromPolicy).put(hsprime, new ArrayList<StateTransition>());
+					List<StateTransition> childProbabilities = this.transition.get(childFromPolicy).get(hsprime);
+					
+					double weightedReward = 0;
+					for(StateTransition nextState : childProbabilities){
+						//get Ra(nextstate)
+						if(task.t.terminal(nextState.s, task.action))
+							continue;
+						
+						HashableState hnext = hashingFactory.hashState(nextState.s);
+						if(!reward.containsKey(task))
+							reward.put(task, new HashMap<HashableState, Double>());
+						if(!reward.get(task).containsKey(hnext))
+							reward.get(task).put(hnext, Vmax);
+						double nextReward = reward.get(task).get(hnext);
+						
+						weightedReward += nextState.probability * nextReward;
+					}
+					
+					if(!reward.containsKey(task))
+						reward.put(task, new HashMap<HashableState, Double>());
+					
+					double newReward = actionReward + weightedReward;
+					reward.get(task).put(hsprime, newReward);
+					
+					//find max change for value iteration
+					if(Math.abs(newReward - prevReward) > maxChange)
+						maxChange = Math.abs(newReward - prevReward);
+					
+					//for all s in ta
+					List<State> terminal = getTerminalStates(task);
+					for(State x :terminal){
+						HashableState hx = hashingFactory.hashState(x);
+						//get current pa(s',x)
+						if(transition.containsKey(task))
+							transition.put(task, new HashMap<HashableState, List<StateTransition>>());
+						if(!transition.get(task).containsKey(hsprime))
+							transition.get(task).put(hsprime, new ArrayList<StateTransition>());
+						List<StateTransition> PaOfs = transition.get(task).get(hsprime);
+						
+						//look for transition from s' to x
+						double oldPrabability = 0;
+						for(StateTransition st: PaOfs){
+							HashableState sthState = hashingFactory.hashState(st.s);
+							if(sthState.equals(hx)){
+								oldPrabability = st.probability;
+								break;
+							}
+						}
+						
+						//p pia(s) (s',x)
+						if(!transition.containsKey(childFromPolicy))
+							transition.put(childFromPolicy, new HashMap<HashableState, List<StateTransition>>());
+						if(!transition.get(childFromPolicy).containsKey(hsprime))
+							transition.get(childFromPolicy).put(hsprime, new ArrayList<StateTransition>());
+						List<StateTransition> piafroms = transition.get(childFromPolicy).get(hsprime);
+						
+						double childProbability = 0;
+						for(StateTransition st: piafroms){
+							HashableState hststate = hashingFactory.hashState(st.s);
+							if(hststate.equals(hx)){
+								childProbability = st.probability;
+								break;
+							}
+						}
+						
+						double weightedTransition = 0;
+						//sum over all p pia(s) (s',.)
+						for(StateTransition st: piafroms){
+							HashableState hspprime = hashingFactory.hashState(st.s);
+							
+							//pa (s'',x)
+							if(!transition.containsKey(task))
+								transition.put(task, new HashMap<HashableState, List<StateTransition>>());
+							if(!transition.get(task).containsKey(hspprime))
+								transition.get(task).put(hspprime, new ArrayList<StateTransition>());
+							
+							double probspptox = 0;
+							List<StateTransition> fromspp = transition.get(task).get(hspprime);
+							for(StateTransition sfromspp: fromspp){
+								HashableState hsx = hashingFactory.hashState(sfromspp.s);
+								if(hsx.equals(hx)){
+									probspptox = sfromspp.probability;
+									break;
+								}
+							}
+							
+							weightedTransition += st.probability * probspptox;
+						}
+						double newProb = childProbability + weightedTransition;
+						
+						if(Math.abs(newProb - oldPrabability) > maxChange)
+							maxChange = Math.abs(newProb - oldPrabability);
+						
+						//set pa(s',x)
+						if(!transition.containsKey(task))
+							transition.put(task, new HashMap<HashableState, List<StateTransition>>());
+						if(!transition.get(task).containsKey(hsprime))
+							transition.get(task).put(hsprime, new ArrayList<StateTransition>());
+						List<StateTransition> paspx = transition.get(task).get(hsprime);
+						
+						for(StateTransition st : paspx){
+							HashableState hsx = hashingFactory.hashState(st.s);
+							if(hsx.equals(hx)){
+								st.probability = newProb;
+								break;
+							}
+						}
+					}
 					
 				}
-				
-				
 				if(maxChange < dynamicPrgEpsilon)
 					converged = true;
 			}
@@ -252,5 +404,34 @@ public class RmaxQLearningAgent implements LearningAgent {
 			this.s = s;
 			this.probability = pr;
 		}
+	}
+	
+	protected void addChildTasks(GroundedTask task){
+		if(!task.t.isTaskPrimitive()){
+			TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
+			List<GroundedTask> childGroundedTasks = new ArrayList<GroundedTask>();
+			for(TaskNode child: children){
+				childGroundedTasks.addAll(child.getApplicableGroundedTasks(env.currentObservation()));
+			}
+			
+			for(GroundedTask gt : childGroundedTasks){
+				if(!groundedTaskMap.containsKey(gt.action.actionName()))
+					groundedTaskMap.put(gt.action.actionName(), gt);
+			}
+		}
+	}
+	
+	protected List<State> getTerminalStates(GroundedTask t){
+		if(terminal.containsKey(t))
+			return terminal.get(t);
+		List<State> reachable = StateReachability.getReachableStates(initialState, t.t.getDomain(), hashingFactory);
+		List<State> terminals = new ArrayList<State>();
+		for(State s :reachable){
+			if(t.t.terminal(s, t.getAction()))
+				terminals.add(s);
+		}
+
+		terminal.put(t, terminals);
+		return terminals;
 	}
 }

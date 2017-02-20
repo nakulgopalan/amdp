@@ -1,10 +1,11 @@
 package amdp.rmaxq.framework;
 
-
 import burlap.mdp.core.action.Action; 
 import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.action.ActionUtils;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.oo.OOSADomain;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +15,12 @@ import java.util.List;
  */
 public abstract class PrimitiveTaskNode implements TaskNode {
     protected ActionType actionType;
-
+    protected OOSADomain domain;
+    
+    public OOSADomain getDomain(){
+    	return domain;
+    }
+    
     public ActionType getActionType() {
         return actionType;
     }
