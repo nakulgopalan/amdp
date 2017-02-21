@@ -17,7 +17,7 @@ import burlap.statehashing.HashableStateFactory;
 
 public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 
-	private Map<HashableState, QValue> qvals;
+	private Map<HashableState, List<QValue>> qvals;
 	private HashableStateFactory hashingFactory;
 	
 	public QProviderRmaxQ(HashableStateFactory hsf){
@@ -32,6 +32,16 @@ public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 
 	}
 
+	public void update(State s, Action a, double val){
+		List<QValue> qvalsins = qvals.get(hashingFactory.hashState(s));
+		for(QValue q : qvalsins){
+			if(q.a.equals(a)){
+				q.q = val;
+				return;
+			}
+		}
+	}
+	
 	public List<QValue> qValues(State s) {
 
 	}
