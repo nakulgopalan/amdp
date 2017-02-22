@@ -1,5 +1,7 @@
 package amdp.rmaxq.framework;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,17 +21,31 @@ public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 
 	private Map<HashableState, List<QValue>> qvals;
 	private HashableStateFactory hashingFactory;
+	private GroundedTask task;
 	
-	public QProviderRmaxQ(HashableStateFactory hsf){
+	public QProviderRmaxQ(HashableStateFactory hsf, GroundedTask t){
 		this.hashingFactory = hsf;
+		this.task = t;
+		this.qvals = new HashMap<HashableState, List<QValue>>();
 	}
 	
 	public double qValue(State s, Action a) {
-
+		HashableState hs = hashingFactory.hashState(s);
+		if(!qvals.containsKey(hs))
+			qvals.put(hs, new ArrayList<QValue>());
+		List<QValue> qval = qvals.get(hs);
+		
+		for(QValue q : qval){
+			if(q.a.equals(a))
+				return q.q;
+		}
+		return 0;
 	}
 
 	public double value(State s) {
-
+		if(task.getTerminalFunction().isTerminal(s))
+			return task.pseudoRewardFunction(s);
+		return QProvider.Helper.maxQ(this, s);
 	}
 
 	public void update(State s, Action a, double val){
@@ -40,10 +56,24 @@ public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 				return;
 			}
 		}
+		qvalsins.add(new QValue(s, a, 0));
 	}
 	
 	public List<QValue> qValues(State s) {
-
+		HashableState hs = hashingFactory.hashState(s);
+		if(!qvals.containsKey(hs)){
+			List<QValue> qs = new ArrayList<QValue>();
+			List<Action> actions = new ArrayList<Action>();
+			TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
+			for(TaskNode child: children){
+				List<GroundedTask> tasks = child.getApplicableGroundedTasks(s);
+				for(GroundedTask a : tasks){
+					qs.add(new QValue(s, a.action, 0));
+				}
+			}
+			qvals.put(hs, qs);
+		}
+		return qvals.get(hs);
 	}
 	
 	public void solverInit(SADomain domain, double gamma, HashableStateFactory hashingFactory) {

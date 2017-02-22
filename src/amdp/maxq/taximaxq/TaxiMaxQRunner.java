@@ -96,18 +96,8 @@ public class TaxiMaxQRunner {
         TaskNode st = new TaxiMAXQL0CardinalMoveTaskNode(south);
         TaskNode nt = new TaxiMAXQL0CardinalMoveTaskNode(north);
         TaskNode[] navigateSubTasks = new TaskNode[]{et,wt,st,nt};
-
-        TaskNode stTest = new TaxiMAXQL0CardinalMoveTaskNode(south);
-
-
-
-
-
         TaskNode pt = new PickupTaskNode(pickup);
         TaskNode dt = new DropTaskNode(dropoff);
-
-
-
 
         TaskNode navigate = new NavigateTaskNode("navigate",locationsList,navigateSubTasks);
         TaskNode[] getNodeSubTasks = new TaskNode[]{pt,navigate};

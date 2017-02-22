@@ -5,6 +5,7 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.oo.ObjectParameterizedAction;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.ObjectParameterizedActionType;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -20,6 +21,8 @@ public class GroundedTask {
 
     int level = 0;
 
+    RewardFunction rf;
+    
     public TaskNode getT() {
         return t;
     }
@@ -32,20 +35,23 @@ public class GroundedTask {
 //    Object params;
 
 
-    public GroundedTask(TaskNode t, ActionType at, String[] params){
+    public GroundedTask(TaskNode t, ActionType at, String[] params, RewardFunction rf){
         this.t = t;
         this.action = new ObjectParameterizedActionType.SAObjectParameterizedAction(at.typeName(), params);
+        this.rf = rf;
     }
 
-    public GroundedTask(TaskNode t, Action a){
+    public GroundedTask(TaskNode t, Action a, RewardFunction rf){
         this.t = t;
         this.action = a;
+        this.rf = rf;
     }
 
-    public GroundedTask(TaskNode t, Action a, int level){
+    public GroundedTask(TaskNode t, Action a, RewardFunction rf, int level){
         this.t = t;
         this.action = a;
         this.level = level;
+        this.rf = rf;
     }
 
     public void setLevel(int level){
@@ -101,7 +107,7 @@ public class GroundedTask {
         }
 
         // check if same task node
-        if (!this.t.getName().equals(o.t.getName())) {
+        if (!this.t.name().equals(o.t.name())) {
             return false;
         }
 
@@ -161,4 +167,7 @@ public class GroundedTask {
 
     }
 
+    public double pseudoRewardFunction(State s){
+    	return rf.reward(s, action, s);
+    }
 }

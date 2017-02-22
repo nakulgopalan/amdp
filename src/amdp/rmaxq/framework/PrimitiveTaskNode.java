@@ -4,6 +4,7 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.action.ActionUtils;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 
 import java.util.ArrayList;
@@ -16,6 +17,16 @@ import java.util.List;
 public abstract class PrimitiveTaskNode implements TaskNode {
     protected ActionType actionType;
     protected OOSADomain domain;
+    protected RewardFunction rf;
+    
+
+    public String name(){
+    	return this.actionType.typeName();
+    }
+
+    public TaskNode[] getChildren(){
+    	return null;
+    }
     
     public OOSADomain getDomain(){
     	return domain;
@@ -41,7 +52,7 @@ public abstract class PrimitiveTaskNode implements TaskNode {
         List<Action> gaList = ActionUtils.allApplicableActionsForTypes(Arrays.asList((ActionType)actionType), s);
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
         for(Action ga:gaList){
-            gtList.add(new GroundedTask(this, ga));
+            gtList.add(new GroundedTask(this, ga, rf));
         }
         return gtList;
     }

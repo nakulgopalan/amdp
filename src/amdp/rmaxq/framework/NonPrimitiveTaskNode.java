@@ -2,7 +2,9 @@ package amdp.rmaxq.framework;
 
 
 import burlap.behavior.policy.Policy;
+import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.statehashing.HashableState;
 
@@ -17,6 +19,8 @@ public abstract class NonPrimitiveTaskNode implements TaskNode{
     protected Policy policy;
     protected String name;
     protected OOSADomain domain;
+    protected TerminalFunction tf;
+    protected RewardFunction rf;
     
     public OOSADomain getDomain(){
     	return domain;
@@ -32,7 +36,7 @@ public abstract class NonPrimitiveTaskNode implements TaskNode{
     }
 
     public TaskNode[] getChildren(){
-        return taskNodes;
+        return taskNodes; 
     }
 
     public void setTaskNodes(TaskNode[] taskNodes) {
@@ -68,7 +72,8 @@ public abstract class NonPrimitiveTaskNode implements TaskNode{
     }
 
     // this is the reward function for the grounded task
-    public double pseudoRewardFunction(State s, GroundedTask gt){
+    
+    public double pseudoRewardFunction(State s){
         return 0.;
     }
 
