@@ -103,7 +103,8 @@ public class TaxiDomain implements DomainGenerator{
 
     public static final String								PASSENGERPICKUPPF = "passengerPickUpPF";
     public static final String								PASSENGERPUTDOWNPF = "passengerPutDownPF";
-
+    public static final String								PASSENGERINTAXI = "passengerInTaxi";
+    
     public static final String                              FUELLOCATION = "fuel";
 
 
@@ -353,7 +354,7 @@ public class TaxiDomain implements DomainGenerator{
         pfs.add(new PF_PickUp(PASSENGERPICKUPPF,domain,new String[]{}));
         pfs.add(new PF_PutDown(PASSENGERPUTDOWNPF,new String[]{}));
         pfs.add(new PF_TaxiAtLoc(TAXIATLOCATIONPF,new String[]{LOCATIONCLASS}));
-
+        pfs.add(new PF_PassengerInTaxi(PASSENGERINTAXI, new String[]{PASSENGERCLASS}));
         return pfs;
     }
 
@@ -406,6 +407,7 @@ public class TaxiDomain implements DomainGenerator{
 
                     if (fickleTaxi) {
                         boolean passengersNotChangingDestinationFlag = true;
+
                         List<ObjectInstance> passengers = ((TaxiState)ns).objectsOfClass(PASSENGERCLASS);
                         for(ObjectInstance pass : passengers){
                             if(!((TaxiPassenger)pass).justPickedUp){
@@ -700,6 +702,31 @@ public class TaxiDomain implements DomainGenerator{
 //        }
     }
 
+
+    public class PF_PassengerInTaxi extends PropositionalFunction {
+
+        public PF_PassengerInTaxi(String name, String [] params){
+            super(name, params);
+        }
+
+        @Override
+        public boolean isTrue(OOState s, String... params) {
+            TaxiState ns = ((TaxiState)s).copy();
+            TaxiAgent taxi = ns.taxi;
+            int tx = taxi.x, ty = taxi.y;
+            boolean taxiOccupied = taxi.taxiOccupied;
+
+            boolean returnValue = false;
+            TaxiPassenger passenger = ns.touchPassenger(params[0]);
+            int px = passenger.x, py = passenger.y;
+            boolean inTaxi = passenger.inTaxi;
+            if(tx == px && ty == py && inTaxi && taxiOccupied ){
+                returnValue = true;
+            }
+
+            return returnValue;
+        }
+    }
 
     //propositional function for taxi at location for navigate
     public class PF_TaxiAtLoc extends PropositionalFunction {

@@ -43,7 +43,7 @@ public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 	}
 
 	public double value(State s) {
-		if(task.getTerminalFunction().isTerminal(s))
+		if(!task.t.isTaskPrimitive() && task.getTerminalFunction().isTerminal(s))
 			return task.pseudoRewardFunction(s);
 		return QProvider.Helper.maxQ(this, s);
 	}
@@ -63,12 +63,16 @@ public class QProviderRmaxQ implements QProvider, MDPSolverInterface{
 		HashableState hs = hashingFactory.hashState(s);
 		if(!qvals.containsKey(hs)){
 			List<QValue> qs = new ArrayList<QValue>();
-			List<Action> actions = new ArrayList<Action>();
-			TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
-			for(TaskNode child: children){
-				List<GroundedTask> tasks = child.getApplicableGroundedTasks(s);
-				for(GroundedTask a : tasks){
-					qs.add(new QValue(s, a.action, 0));
+			if(task.t.isTaskPrimitive()){
+				qs.add(new QValue(s, task.action, 0));
+			}else{
+			
+				TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
+				for(TaskNode child: children){
+					List<GroundedTask> tasks = child.getApplicableGroundedTasks(s);
+					for(GroundedTask a : tasks){
+						qs.add(new QValue(s, a.action, 0));
+					}
 				}
 			}
 			qvals.put(hs, qs);

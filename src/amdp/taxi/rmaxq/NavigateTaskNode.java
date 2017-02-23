@@ -15,6 +15,7 @@ import burlap.mdp.auxiliary.common.GoalConditionTF;
 import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.common.GoalBasedRF;
@@ -34,6 +35,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
     
     public NavigateTaskNode(String[] locs, TaskNode[] children, OOSADomain dom){
         gtasks = new ArrayList<GroundedTask>();
+        name = ACTION_NAVIGATE;
         this.domain = dom;
         locations = locs;
     	this.taskNodes = children;
@@ -47,7 +49,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
 
     @Override
     public boolean terminal(State s, Action action) {
-        String location = ((TaxiL1Domain.NavigateType.NavigateAction)action).location;
+        String location = ((NavigateType.NavigateAction)action).location;
         StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{location}));
         return new GoalConditionTF(sc).isTerminal(s);
     }

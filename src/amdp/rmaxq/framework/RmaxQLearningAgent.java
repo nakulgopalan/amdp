@@ -1,6 +1,6 @@
 package amdp.rmaxq.framework;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ import burlap.behavior.policy.GreedyDeterministicQPolicy;
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.SolverDerivedPolicy;
 import burlap.behavior.singleagent.Episode;
-import burlap.behavior.singleagent.auxiliary.StateReachability;
+//import burlap.behavior.singleagent.auxiliary.StateReachability;
 import burlap.behavior.singleagent.learning.LearningAgent;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
@@ -391,7 +391,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 					for(State x :terminal){
 						HashableState hx = hashingFactory.hashState(x);
 						//get current pa(s',x)
-						if(transition.containsKey(task))
+						if(!transition.containsKey(task))
 							transition.put(task, new HashMap<HashableState, Map<HashableState,Double>>());
 						if(!transition.get(task).containsKey(hsprime))
 							transition.get(task).put(hsprime, new HashMap<HashableState, Double>());
@@ -462,7 +462,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 	protected List<State> getTerminalStates(GroundedTask t){
 		if(terminal.containsKey(t))
 			return terminal.get(t);
-		List<State> reachable = StateReachability.getReachableStates(initialState, t.t.getDomain(), hashingFactory);
+  		List<State> reachable = StateReachability.getReachableStates(initialState, t.t.getDomain(), hashingFactory, 100);
 		List<State> terminals = new ArrayList<State>();
 		for(State s :reachable){
 			if(t.t.terminal(s, t.getAction()))

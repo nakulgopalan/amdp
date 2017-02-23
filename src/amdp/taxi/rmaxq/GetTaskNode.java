@@ -7,6 +7,7 @@ import amdp.amdpframework.GroundedPropSC;
 import amdp.rmaxq.framework.GroundedTask;
 import amdp.rmaxq.framework.NonPrimitiveTaskNode;
 import amdp.rmaxq.framework.TaskNode;
+import amdp.taxi.TaxiDomain;
 import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
 import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
@@ -32,11 +33,7 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
     protected String[] passengers;
     public GetTaskNode(OOSADomain taxiL2Domain, String[] passes,  TaskNode[] children){
         this.domain = taxiL2Domain;
-        this.domain.clearActionTypes();
-        this.domain.addActionTypes(
-//                new UniversalActionType(TaxiL1Domain.ACTION_PUTDOWNL1),
-                new UniversalActionType(TaxiL1Domain.ACTION_PICKUPL1),
-                new TaxiL1Domain.NavigateType());
+        this.name = ACTION_GET;
         this.taskNodes = children;
         this.passengers = passes;
     }
@@ -49,8 +46,8 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
     @Override
     public boolean terminal(State s, Action action) {
 
-        String passName = ((TaxiL2Domain.GetType.GetAction)action).passenger;
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiL1Domain.TAXIATPASSENGERPF), new String[]{passName}));
+        String passName = ((GetType.GetAction)action).passenger;
+        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERINTAXI), new String[]{passName}));
         return new GoalConditionTF(sc).isTerminal(s);
     }
 
@@ -59,7 +56,7 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
         for(String pass : passengers){
         	StateConditionTest sc =  new GroundedPropSC(new GroundedProp
-        			(domain.propFunction(TaxiL1Domain.TAXIATPASSENGERPF), new String[]{pass}));
+        			(domain.propFunction(TaxiDomain.PASSENGERINTAXI), new String[]{pass}));
             gtList.add(new GroundedTask(this, new GetType.GetAction(pass), new GoalBasedRF(sc)));
         }
         return gtList;

@@ -28,13 +28,15 @@ public class RootTaskNode extends NonPrimitiveTaskNode {
         this.name = name;
         this.params.add(new String[]{"1"});
         this.taskNodes = children;
+        this.domain = domainIn;
+
         TerminalFunction taxiTF = new TaxiTerminationFunction();
         RewardFunction taxiRF = new TaxiRewardFunction(numPas, taxiTF);
         
         for(String[] param:params){
-            groundedTasks.add(new GroundedTask(this, new SimpleAction(name+":"+param), taxiRF));
+            groundedTasks.add(new GroundedTask(this, new SimpleAction(name+":"+param), taxiRF
+            		));
         }
-        this.domain = domainIn;
     }
 
 

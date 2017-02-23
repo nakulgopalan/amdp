@@ -12,6 +12,8 @@ import amdp.taxi.TaxiVisualizer;
 import amdp.taxi.state.TaxiLocation;
 import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
+import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
+import amdp.taxiamdpdomains.taxiamdplevel2.TaxiL2Domain;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
 import burlap.behavior.singleagent.learning.LearningAgent;
@@ -36,13 +38,12 @@ public class TaxiRmaxQDriver {
         RewardFunction taxiRF = new TaxiRewardFunction(1,taxiTF);
 
         TaxiDomain TDGen = new TaxiDomain(taxiRF, taxiTF);
-
+        
         TDGen.setTransitionDynamicsLikeFickleTaxiProlem();
         TDGen.setFickleTaxi(true);
         TDGen.setIncludeFuel(false);
         OOSADomain td = TDGen.generateDomain();
         domain = td;
-        
         State s = TaxiDomain.getClassicState(td, false);
         env = new SimulatedEnvironment(td, s);
         
@@ -97,7 +98,7 @@ public class TaxiRmaxQDriver {
 		HashableStateFactory hs = new SimpleHashableStateFactory();
 		
 		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 5, 0.001);
-		Episode e = RmaxQ.runLearningEpisode(env);
+ 		Episode e = RmaxQ.runLearningEpisode(env);
 		List<Episode> episodes = new ArrayList<Episode>();
 		episodes.add(e);
 		

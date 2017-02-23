@@ -7,6 +7,7 @@ import amdp.amdpframework.GroundedPropSC;
 import amdp.rmaxq.framework.GroundedTask;
 import amdp.rmaxq.framework.NonPrimitiveTaskNode;
 import amdp.rmaxq.framework.TaskNode;
+import amdp.taxi.TaxiDomain;
 import amdp.taxi.state.TaxiLocation;
 import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
@@ -16,6 +17,7 @@ import burlap.mdp.auxiliary.common.GoalConditionTF;
 import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.common.GoalBasedRF;
@@ -33,6 +35,7 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
     protected String[] passenders;
     public PutTaskNode(OOSADomain taxiL1Domain, String[] passes, TaskNode[] children){
         this.domain = taxiL1Domain;
+        this.name = ACTION_PUT;
         this.taskNodes = children;
         passenders = passes;
     }
@@ -49,10 +52,10 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
 
     @Override
     public boolean terminal(State s, Action action) {
-        String passName = ((TaxiL2Domain.PutType.PutAction)action).passenger;
+        String passName = ((PutType.PutAction)action).passenger;
 //        String location = ((TaxiL2Domain.PutType.PutAction)action).location;
 //        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(oosaDomain.propFunction(TaxiL1Domain.PASSENGERATLOCATIONPF), new String[]{passName,location}));
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiL1Domain.PASSENGERATGOALLOCATIONPF), new String[]{passName}));
+        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{passName}));
         return new GoalConditionTF(sc).isTerminal(s);
     }
 
@@ -61,7 +64,7 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
         for(String pass : passenders){
-        	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiL1Domain.PASSENGERATGOALLOCATIONPF), new String[]{pass}));
+        	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{pass}));
             gtList.add(new GroundedTask(this, new PutType.PutAction(pass), new GoalBasedRF(sc)));
         }
         return gtList;
