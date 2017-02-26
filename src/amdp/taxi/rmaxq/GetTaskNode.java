@@ -57,7 +57,7 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
         for(String pass : passengers){
         	StateConditionTest sc =  new GroundedPropSC(new GroundedProp
         			(domain.propFunction(TaxiDomain.PASSENGERINTAXI), new String[]{pass}));
-            gtList.add(new GroundedTask(this, new GetType.GetAction(pass), new GoalBasedRF(sc)));
+            gtList.add(new GroundedTask(this, new GetType.GetAction(pass), new GoalBasedRF(sc, 10)));
         }
         return gtList;
     }

@@ -68,7 +68,8 @@ public class RmaxQLearningAgent implements LearningAgent {
 	private double Vmax;
 	private Environment env;
 	private State initialState;
-	
+	private List<State> reachableStates = new ArrayList<State>();
+	private long time = 0;
 	public RmaxQLearningAgent(TaskNode root, HashableStateFactory hs, double vmax, int threshold, double maxDelta){
 //		this.qValue = new HashMap<GroundedTask, Map<HashableState,Map<GroundedTask,Double>>>();
 //		this.value = new HashMap<GroundedTask, Map<HashableState,Double>>();
@@ -101,7 +102,12 @@ public class RmaxQLearningAgent implements LearningAgent {
 		this.initialState = env.currentObservation();
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
-		return R_MaxQ(env.currentObservation(), rootSolve, e);
+		reachableStates = StateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
+		
+		time = System.currentTimeMillis();
+		e = R_MaxQ(env.currentObservation(), rootSolve, e);
+		time = System.currentTimeMillis() - time;
+		return e;
 	}
 
 	protected Episode R_MaxQ(State s, GroundedTask task, Episode e){
@@ -113,7 +119,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 			State sprime = outcome.op;
 			HashableState hsprime = hashingFactory.hashState(sprime);
 			
-			//r(s,a) ++
+			//r(s,a) += r
 			if(!totalReward.containsKey(hs))
 				totalReward.put(hs, new HashMap<GroundedTask, Double>());
 			if(!totalReward.get(hs).containsKey(task))
@@ -166,13 +172,13 @@ public class RmaxQLearningAgent implements LearningAgent {
 				
 				Action maxqAction = taskFromPolicy.action(s);
 				if(!groundedTaskMap.containsKey(maxqAction.actionName()))
-					addChildTasks(task);
+					addChildTasks(task, s);
 				
 				//R pia(s') (s')
 				GroundedTask childFromPolicy = groundedTaskMap.get(maxqAction.actionName());
 				e = R_MaxQ(s, childFromPolicy , e);
 				
-				terminal = task.t.terminal(s, task.action);
+				terminal = task.t.terminal(env.currentObservation(), task.action);
 			}while(!terminal);
 			
 			return e;
@@ -193,12 +199,12 @@ public class RmaxQLearningAgent implements LearningAgent {
 			for(int i = 0; i < envolopA.size(); i++){
 				State sprime = envolopA.get(i);
 				HashableState hsprime = hashingFactory.hashState(sprime);
-				List<GroundedTask> ActionIns = getTaskActions(task);
+				List<GroundedTask> ActionIns = getTaskActions(task, sprime);
 				for(int j  = 0; j < ActionIns.size(); j++){
 					GroundedTask a = ActionIns.get(j);
-					if(!qProvider.containsKey(a))
-						qProvider.put(a, new QProviderRmaxQ(hashingFactory, a));
-					QProviderRmaxQ qp = qProvider.get(a);
+					if(!qProvider.containsKey(task))
+						qProvider.put(task, new QProviderRmaxQ(hashingFactory, a));
+					QProviderRmaxQ qp = qProvider.get(task);
 					double oldQ = qp.qValue(sprime, a.action);
 					
 					//Ra'(s')
@@ -239,10 +245,10 @@ public class RmaxQLearningAgent implements LearningAgent {
 		
 		if(!envelope.contains(s)){
 			envelope.add(s);
-			List<GroundedTask> ActionIns = getTaskActions(task);
+			List<GroundedTask> ActionIns = getTaskActions(task, s);
 			for(int i = 0; i < ActionIns.size(); i++){
 				GroundedTask a = ActionIns.get(i);
-				computeModel(s, a);
+				computeModel(s, a); 
 				
 				//get function forPa'(s, .)
 				if(!transition.containsKey(a))
@@ -342,7 +348,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 					
 					Action maxqAction = taskFromPolicy.action(sprime);
 					if(!groundedTaskMap.containsKey(maxqAction.actionName()))
-						addChildTasks(task);
+						addChildTasks(task, sprime);
 					
 					//R pia(s') (s')
 					GroundedTask childFromPolicy = groundedTaskMap.get(maxqAction.actionName());
@@ -447,10 +453,10 @@ public class RmaxQLearningAgent implements LearningAgent {
 		}
 	}
 		
-	protected void addChildTasks(GroundedTask task){
+	protected void addChildTasks(GroundedTask task, State s){
 		if(!task.t.isTaskPrimitive()){
 			TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
-			List<GroundedTask> childGroundedTasks =  getTaskActions(task);
+			List<GroundedTask> childGroundedTasks =  getTaskActions(task, s);
 			
 			for(GroundedTask gt : childGroundedTasks){
 				if(!groundedTaskMap.containsKey(gt.action.actionName()))
@@ -462,22 +468,22 @@ public class RmaxQLearningAgent implements LearningAgent {
 	protected List<State> getTerminalStates(GroundedTask t){
 		if(terminal.containsKey(t))
 			return terminal.get(t);
-  		List<State> reachable = StateReachability.getReachableStates(initialState, t.t.getDomain(), hashingFactory, 100);
-		List<State> terminals = new ArrayList<State>();
-		for(State s :reachable){
+  		List<State> terminals = new ArrayList<State>();
+		for(State s :reachableStates){
 			if(t.t.terminal(s, t.getAction()))
 				terminals.add(s);
 		}
 
 		terminal.put(t, terminals);
+		System.out.println(terminals.size());
 		return terminals;
 	}
 	
-	public List<GroundedTask> getTaskActions(GroundedTask task){
+	public List<GroundedTask> getTaskActions(GroundedTask task, State s){
 		TaskNode[] children = task.t.getChildren();
 		List<GroundedTask> childTasks = new ArrayList<GroundedTask>();
 		for(TaskNode t: children){
-			childTasks.addAll(t.getApplicableGroundedTasks(env.currentObservation()));
+			childTasks.addAll(t.getApplicableGroundedTasks(s));
 		}
 		return childTasks;
 	}

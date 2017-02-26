@@ -62,7 +62,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
         	StateConditionTest st = new GroundedPropSC
         			(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{loc}));
         	
-            gtList.add(new GroundedTask(this, new NavigateType.NavigateAction(loc), new GoalBasedRF(st, 0) ));
+            gtList.add(new GroundedTask(this, new NavigateType.NavigateAction(loc), new GoalBasedRF(st, 10) ));
         }
         return gtList;
     }

@@ -53,8 +53,6 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
     @Override
     public boolean terminal(State s, Action action) {
         String passName = ((PutType.PutAction)action).passenger;
-//        String location = ((TaxiL2Domain.PutType.PutAction)action).location;
-//        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(oosaDomain.propFunction(TaxiL1Domain.PASSENGERATLOCATIONPF), new String[]{passName,location}));
         StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{passName}));
         return new GoalConditionTF(sc).isTerminal(s);
     }
@@ -65,7 +63,7 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
         for(String pass : passenders){
         	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{pass}));
-            gtList.add(new GroundedTask(this, new PutType.PutAction(pass), new GoalBasedRF(sc)));
+            gtList.add(new GroundedTask(this, new PutType.PutAction(pass), new GoalBasedRF(sc, 10)));
         }
         return gtList;
     }
