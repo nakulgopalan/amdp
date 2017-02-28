@@ -117,7 +117,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 			EnvironmentOutcome outcome = env.executeAction(a);
 			e.transition(outcome);
 			State sprime = outcome.op;
-			HashableState hsprime = hashingFactory.hashState(sprime);
+ 			HashableState hsprime = hashingFactory.hashState(sprime);
 			
 			//r(s,a) += r
 			if(!totalReward.containsKey(hs))

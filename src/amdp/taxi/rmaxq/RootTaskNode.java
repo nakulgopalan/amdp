@@ -30,8 +30,8 @@ public class RootTaskNode extends NonPrimitiveTaskNode {
         this.taskNodes = children;
         this.domain = domainIn;
 
-        TerminalFunction taxiTF = new TaxiTerminationFunction();
-        RewardFunction taxiRF = new TaxiRewardFunction(numPas, taxiTF);
+        this.tf = new TaxiTerminationFunction();
+        RewardFunction taxiRF = new TaxiRewardFunction(numPas, tf);
         
         for(String[] param:params){
             groundedTasks.add(new GroundedTask(this, new SimpleAction(name+":"+param), taxiRF
@@ -47,6 +47,7 @@ public class RootTaskNode extends NonPrimitiveTaskNode {
 
     @Override
     public boolean terminal(State s, Action action) {
+    	tf = new TaxiTerminationFunction();
         return this.tf.isTerminal(s);
     }
 

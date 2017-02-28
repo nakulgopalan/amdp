@@ -16,11 +16,16 @@ import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
 import amdp.taxiamdpdomains.taxiamdplevel2.TaxiL2Domain;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
+import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
+import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
+import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
 import burlap.behavior.singleagent.learning.LearningAgent;
+import burlap.behavior.singleagent.learning.LearningAgentFactory;
 import burlap.mdp.core.Domain;
 import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.state.State;
+import burlap.mdp.singleagent.common.VisualActionObserver;
 import burlap.mdp.singleagent.environment.SimulatedEnvironment;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
@@ -92,18 +97,45 @@ public class TaxiRmaxQDriver {
         return root;
 	}
 	
+	public static void runTests(){
+	
+		LearningAgentFactory RmaxQ = new LearningAgentFactory() {
+			
+			public String getAgentName() {
+				return "R-maxQ";
+			}
+			
+			@Override
+			public LearningAgent generateAgent() {
+				TaskNode root = setupHeirarcy();
+				HashableStateFactory hs = new SimpleHashableStateFactory();
+				return new RmaxQLearningAgent(root, hs, 100, 5, 0.001);
+			}
+		};
+		
+		LearningAlgorithmExperimenter exp = new LearningAlgorithmExperimenter(env, 10, 1000, RmaxQ);
+		exp.setUpPlottingConfiguration(500, 250, 2, 1000,
+				TrialMode.MOST_RECENT_AND_AVERAGE,
+				PerformanceMetric.CUMULATIVE_STEPS_PER_EPISODE,
+				PerformanceMetric.AVERAGE_EPISODE_REWARD);
+
+		exp.startExperiment();
+	}
 	
 	public static void main(String[] args) {
 		TaskNode root = setupHeirarcy();
 		HashableStateFactory hs = new SimpleHashableStateFactory();
 		
-		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 5, 0.001);
+//		VisualActionObserver observer = new VisualActionObserver(root.getDomain(), TaxiVisualizer.getVisualizer(5, 5));
+//		observer.initGUI();
+//		env.addObservers(observer);
+		
+		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 3, 0.001);
  		Episode e = RmaxQ.runLearningEpisode(env);
-		List<Episode> episodes = new ArrayList<Episode>();
-		episodes.add(e);
+		e.write("output/episode_1");
 		
 		Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
-		new EpisodeSequenceVisualizer(v, domain, episodes );
+		new EpisodeSequenceVisualizer(v, domain, "output/" );
 	}
 
 }
