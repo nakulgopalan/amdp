@@ -1,142 +1,144 @@
 package amdp.taxi.rmaxq;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import amdp.amdpframework.GroundedPropSC;
 import amdp.rmaxq.framework.GroundedTask;
 import amdp.rmaxq.framework.NonPrimitiveTaskNode;
 import amdp.rmaxq.framework.TaskNode;
 import amdp.taxi.TaxiDomain;
+import amdp.taxi.state.TaxiAgent;
 import amdp.taxi.state.TaxiLocation;
+import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
-import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
-import burlap.mdp.auxiliary.common.GoalConditionTF;
-import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
+import burlap.behavior.valuefunction.QValue;
 import burlap.mdp.core.action.Action;
-import burlap.mdp.core.action.ActionType;
-import burlap.mdp.core.action.UniversalActionType;
-import burlap.mdp.core.oo.propositional.GroundedProp;
+import burlap.mdp.core.action.SimpleAction;
+import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.core.state.State;
-import burlap.mdp.singleagent.common.GoalBasedRF;
-import burlap.mdp.singleagent.oo.OOSADomain;
+import burlap.mdp.singleagent.common.UniformCostRF;
+import burlap.mdp.singleagent.model.RewardFunction;
+import burlap.statehashing.HashableState;
+import burlap.statehashing.HashableStateFactory;
+import burlap.statehashing.WrappedHashableState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by ngopalan on 8/14/16.
+ * Created by ngopalan on 5/23/16.
  */
-public class NavigateTaskNode extends NonPrimitiveTaskNode{
+public class NavigateTaskNode extends NonPrimitiveTaskNode {
 
 
-//    OOSADomain l0Domain;
+    // all possible bindings for the current node
+    List<String> locationNames = new ArrayList<String>();
+    List<GroundedTask> groundedTasks = new ArrayList<GroundedTask>();
 
-	public static final String ACTION_NAVIGATE = "navigate";
-    protected List<GroundedTask> gtasks;
-    protected String[] locations;
-    
-    public NavigateTaskNode(String[] locs, TaskNode[] children, OOSADomain dom){
-        gtasks = new ArrayList<GroundedTask>();
-        name = ACTION_NAVIGATE;
-        this.domain = dom;
-        locations = locs;
-    	this.taskNodes = children;
+    HashableStateFactory hsf = new HashableStateFactory() {
+        @Override
+        public HashableState hashState(State s) {
+            return new NavigateHashState(s);
+        }
+    };
+
+    public NavigateTaskNode(String name, List<String> locationNames, TaskNode[] children){
+        this.name = name;
+        this.locationNames = locationNames;
+        this.setTaskNodes(children);
+        
+        System.err.println("Warning: unsure about RF used in NavigateTaskNode");
+        RewardFunction rf = new UniformCostRF();       
+        for(String locationName : locationNames){
+            // param[0] is the goal location!
+            groundedTasks.add(new GroundedTask(this, new SimpleAction(name+":" + locationName), rf));
+        }
     }
 
     @Override
-    public Object parametersSet(State s) {
-        return locations;
+    public boolean terminal(State s, Action navAction){
+        // the parameters are from a grounded task of the type String[]
+        List<TaxiLocation> locations = ((TaxiState)s).locations;
+        TaxiAgent taxi = ((TaxiState)s).taxi;
+        String goalLocation = navAction.actionName().split(":")[1];//((String[])parameters)[0];
+        for(TaxiLocation location:locations){
+            if(location.name().equals(goalLocation)){
+                if(taxi.x==location.x &&
+                        taxi.y==location.y){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
-
-    @Override
-    public boolean terminal(State s, Action action) {
-        String location = ((NavigateType.NavigateAction)action).location;
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{location}));
-        return new GoalConditionTF(sc).isTerminal(s);
-    }
 
     @Override
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
-        
-        for( String loc : locations){
-        	StateConditionTest st = new GroundedPropSC
-        			(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{loc}));
-        	
-            gtList.add(new GroundedTask(this, new NavigateType.NavigateAction(loc), new GoalBasedRF(st, 10) ));
+        for(GroundedTask gt:this.groundedTasks){
+            if(!this.terminal(s,gt.getAction())){
+                gtList.add(gt);
+            }
+
         }
         return gtList;
     }
-    
-    public static class NavigateType implements ActionType {
+
+    @Override
+    public List<String> parametersSet(State s) {
+        return locationNames;
+    }
 
 
-        public NavigateType() {
-//            actions = new ArrayList<Action>(locations.size());
-//            for(String location : locations){
-//                actions.add(new NavigateAction(location));
-//            }
+    @Override
+    public boolean hasHashingFactory(){
+        return true;
+    }
+
+    @Override
+    public HashableState hashedState(State s, GroundedTask childTask){
+        return this.hsf.hashState(s);
+    }
+
+    public class NavigateHashState extends WrappedHashableState {
+        // original state
+        State state;
+
+        public NavigateHashState(State s){
+            this.state = s;
+        }
+
+        private int createHash(){
+
+            int x = ((TaxiState)state).taxi.x;
+            int y = ((TaxiState)state).taxi.y;
+            return 10*x + y;
         }
 
         @Override
-        public String typeName() {
-            return ACTION_NAVIGATE;
+        public int hashCode() {
+            // boolean true or false
+            return createHash();
         }
 
         @Override
-        public Action associatedAction(String strRep) {
-            return new NavigateAction(strRep);
-        }
-
-        @Override
-        public List<Action> allApplicableActions(State s) {
-            List<Action> actions = new ArrayList<Action>();
-            List<TaxiLocation> locations = ((TaxiState)s).locations;
-            for(TaxiLocation location: locations){
-                actions.add(new NavigateAction(location.colour));
-            }
-            return actions;
-        }
-
-        public static class NavigateAction implements Action{
-
-            public String location;
-
-            public NavigateAction(String location) {
-            	System.out.println("NAVACTION: " + location);
-                this.location= location;
+        public boolean equals(Object obj) {
+            // check hash of both obj and our, if equal then return true else false!
+//            System.out.println("was here too 3!");
+            if (obj == null) {
+                return false;
             }
 
-            @Override
-            public String actionName() {
-                return ACTION_NAVIGATE + "_" + location;
+            if (getClass() != obj.getClass()) {
+                return false;
             }
 
-            @Override
-            public Action copy() {
-                return new NavigateAction(location);
-            }
+            NavigateHashState otherObj = (NavigateHashState)obj;
 
-            @Override
-            public boolean equals(Object o) {
-                if(this == o) return true;
-                if(o == null || getClass() != o.getClass()) return false;
-
-                NavigateAction that = (NavigateAction) o;
-
-                return that.location.equals(location) ;
-
-            }
-
-            @Override
-            public int hashCode() {
-                String str = ACTION_NAVIGATE + "_" + location;
-                return str.hashCode();
-            }
-
-            @Override
-            public String toString() {
-                return this.actionName();
-            }
+            // if legal then equal
+            return (otherObj.createHash() == this.createHash()) ? true : false;
         }
     }
+
 }

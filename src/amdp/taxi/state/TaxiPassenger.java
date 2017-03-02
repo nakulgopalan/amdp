@@ -33,7 +33,9 @@ public class TaxiPassenger implements ObjectInstance {
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_JUSTPICKEDUP, VAR_INTAXI, VAR_GOALLOCATION, VAR_PICKEDUPATLEASTONCE ,VAR_ORIGINALSOURCELOCATION);
 
-
+    public TaxiPassenger() {
+    	
+    }
 
     public TaxiPassenger(String name, int x, int y,  boolean inTaxi,
                          boolean justPickedUp, String goalLocation,
@@ -71,9 +73,8 @@ public class TaxiPassenger implements ObjectInstance {
 
     @Override
     public TaxiPassenger  copyWithName(String objectName) {
-        TaxiPassenger nPassenger = this.copy();
-        nPassenger.name = objectName;
-        return nPassenger;
+        return new TaxiPassenger(objectName, x, y, inTaxi, justPickedUp,
+                goalLocation, pickedUpAtLeastOnce, originalSourceLocation);
     }
 
     @Override
@@ -121,6 +122,12 @@ public class TaxiPassenger implements ObjectInstance {
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        String out = "";
+        out += name+"(passenger), (" + x + ", " + y + ")";
+        out += ", goalLocation: " + goalLocation;
+        out += ", originalLocation: " + originalSourceLocation;
+        out += ", justPickedUp: " + justPickedUp;
+        out += ", pickedUpAtLeastOnce:" + pickedUpAtLeastOnce;
+        return out;
     }
 }

@@ -8,6 +8,7 @@ import amdp.taxi.TaxiDomain;
 import amdp.taxi.TaxiRewardFunction;
 import amdp.taxi.TaxiTerminationFunction;
 import amdp.taxi.TaxiVisualizer;
+import amdp.taxi.state.TaxiState;
 import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
 import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1TerminalFunction;
 import amdp.taxiamdpdomains.taxiamdplevel1.taxil1state.L1StateMapper;
@@ -16,6 +17,7 @@ import amdp.taxiamdpdomains.taxiamdplevel2.TaxiL2TerminalFunction;
 import amdp.taxiamdpdomains.taxiamdplevel2.taxil2state.L2StateMapper;
 import amdp.taxiamdpdomains.testingtools.BoundedRTDPForTests;
 import amdp.taxiamdpdomains.testingtools.MutableGlobalInteger;
+import amdp.utilities.BoundedStateReachability;
 import burlap.behavior.policy.Policy;
 import burlap.behavior.policy.PolicyUtils;
 import burlap.behavior.singleagent.Episode;
@@ -29,21 +31,26 @@ import burlap.mdp.auxiliary.StateMapping;
 import burlap.mdp.core.Domain;
 import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.oo.state.ObjectInstance;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.SADomain;
 import burlap.mdp.singleagent.common.UniformCostRF;
+import burlap.mdp.singleagent.common.VisualActionObserver;
 import burlap.mdp.singleagent.environment.SimulatedEnvironment;
 import burlap.mdp.singleagent.model.FactoredModel;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.mdp.stochasticgames.agent.AgentFactory;
 import burlap.shell.visual.VisualExplorer;
+import burlap.statehashing.HashableState;
+import burlap.statehashing.HashableStateFactory;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by ngopalan on 8/14/16.
@@ -89,10 +96,8 @@ public class TaxiBasePlanner {
         RewardFunction rf = new TaxiRewardFunction(1,tf);
 
         TaxiDomain tdGen = new TaxiDomain(rf,tf);
-
-
-
-        tdGen.setTransitionDynamicsLikeFickleTaxiProlem();
+        tdGen.setFickleProbability(0.0);
+//        tdGen.setTransitionDynamicsLikeFickleTaxiProlem();
         tdGen.setFickleTaxi(false);
         tdGen.setIncludeFuel(false);
 
@@ -125,9 +130,19 @@ public class TaxiBasePlanner {
         System.out.println("Choosing random start? " + randomStart +", Choosing single passenger? " + singlePassenger);
 
 
+        HashableStateFactory hashingFactory = new SimpleHashableStateFactory(true); // was false
+        Set<HashableState> reachableStates = BoundedStateReachability.getReachableHashedStates(startState, td, hashingFactory, 1000);
+        System.out.println("reachableStates: " + reachableStates.size());
+//        for (HashableState hs : reachableStates) {
+//        	System.out.println(hs.s());
+//        	TaxiState state = (TaxiState) hs.s();
+//        	List<ObjectInstance> walls = state.objectsOfClass(TaxiDomain.WALLCLASS);
+//        	System.out.println(walls);
+//        }
+
 //        startState = TaxiDomain.getComplexState(false);
 
-        BoundedRTDPForTests brtdp = new BoundedRTDPForTests(td, 0.99,  new SimpleHashableStateFactory(false),new ConstantValueFunction(0.),
+        BoundedRTDPForTests brtdp = new BoundedRTDPForTests(td, 0.99, hashingFactory, new ConstantValueFunction(0.),
                 new ConstantValueFunction(1.), 0.01, 500);
         brtdp.setRemainingNumberOfBellmanUpdates(bellmanBudget);
 
@@ -139,14 +154,14 @@ public class TaxiBasePlanner {
 
 
 
-//        SimulatedEnvironment envN = new SimulatedEnvironment(tdEnv, startState);
+        SimulatedEnvironment envN = new SimulatedEnvironment(td, startState);
 
         Episode e = PolicyUtils.rollout(p, startState, td.getModel(), maxTrajectoryLength);
 
-//        Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
-//        List<Episode> eaList = new ArrayList<Episode>();
-//        eaList.add(e);
-//        new EpisodeSequenceVisualizer(v, td, eaList);
+        Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
+        List<Episode> eaList = new ArrayList<Episode>();
+        eaList.add(e);
+        new EpisodeSequenceVisualizer(v, td, eaList);
     	//create visualizer and explorer
         
 //		Visualizer v = TaxiVisualizer.getVisualizer(5,5);

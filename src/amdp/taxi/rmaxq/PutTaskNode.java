@@ -136,12 +136,6 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
             }
 
             @Override
-            public int hashCode() {
-                String str = ACTION_PUT + "_" + passenger;// + "_" + location;
-                return str.hashCode();
-            }
-
-            @Override
             public String toString() {
                 return this.actionName();
             }

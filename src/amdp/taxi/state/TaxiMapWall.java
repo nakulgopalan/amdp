@@ -33,6 +33,10 @@ public class TaxiMapWall implements ObjectInstance {
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_WALLOFFSET, VAR_WALLMIN, VAR_WALLMAX);
 
+    public TaxiMapWall() {
+    	
+    }
+    
     public TaxiMapWall(String name, int wallMin, int wallMax, int wallOffset, boolean verticalWall) {
         this.name = name;
         this.wallMax = wallMax;
@@ -57,9 +61,7 @@ public class TaxiMapWall implements ObjectInstance {
 
     @Override
     public TaxiMapWall copyWithName(String objectName) {
-        TaxiMapWall nWall = this.copy();
-        nWall.name = objectName;
-        return nWall;
+        return new TaxiMapWall(objectName,  wallMin, wallMax,wallOffset, verticalWall);
     }
 
     @Override
@@ -96,6 +98,6 @@ public class TaxiMapWall implements ObjectInstance {
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        return name+"(mapwall), (" + wallMin + ", " + wallMax + "), offset: " + wallOffset + "vertical: " + verticalWall;
     }
 }

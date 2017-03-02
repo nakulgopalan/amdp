@@ -23,6 +23,11 @@ public class TaxiLocation implements ObjectInstance {
 
     String name;
     private final static List<Object> keys = Arrays.<Object>asList(VAR_LOCATION, VAR_Y, VAR_X);
+    
+    public TaxiLocation() {
+    	
+    }
+    
     public TaxiLocation(int x, int y, String name, String colour) {
         this.x = x;
         this.y = y;
@@ -42,9 +47,7 @@ public class TaxiLocation implements ObjectInstance {
 
     @Override
     public TaxiLocation copyWithName(String objectName) {
-        TaxiLocation nLocation = this.copy();
-        nLocation.name = objectName;
-        return nLocation;
+        return new TaxiLocation(this.x, this.y, objectName, this.colour);
     }
 
     @Override
@@ -78,6 +81,6 @@ public class TaxiLocation implements ObjectInstance {
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        return name+"(location), (" + x + ", " + y + "), colour: " + colour;
     }
 }

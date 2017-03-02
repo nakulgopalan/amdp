@@ -104,7 +104,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
 		reachableStates = BoundedStateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
-		
+		System.out.println("in runLearningEpisode, reachableStates: " + reachableStates.size());
 		time = System.currentTimeMillis();
 		e = R_MaxQ(env.currentObservation(), rootSolve, e);
 		time = System.currentTimeMillis() - time;
@@ -475,10 +475,10 @@ public class RmaxQLearningAgent implements LearningAgent {
 				terminals.add(s);
 		}
 		
-		System.out.println(t.actionName() + " " + terminals.size());
+		System.err.println("Warning: actionName below currently has an extra '0' at the end of each, unsure why");
+		System.out.println("For " + t.actionName() + ", found " + terminals.size() + " terminal states");
 
 		terminal.put(t, terminals);
-		System.out.println(terminals.size());
 		return terminals;
 	}
 	

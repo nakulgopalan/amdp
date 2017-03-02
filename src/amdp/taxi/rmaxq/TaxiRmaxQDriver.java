@@ -21,6 +21,7 @@ import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
 import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
 import burlap.behavior.singleagent.learning.LearningAgent;
 import burlap.behavior.singleagent.learning.LearningAgentFactory;
+import burlap.debugtools.RandomFactory;
 import burlap.mdp.core.Domain;
 import burlap.mdp.core.TerminalFunction;
 import burlap.mdp.core.action.ActionType;
@@ -54,7 +55,8 @@ public class TaxiRmaxQDriver {
         
         List<TaxiPassenger> passengers = ((TaxiState)s).passengers;
         List<TaxiLocation> locations = ((TaxiState)s).locations;
-        String[] locs = new String[locations.size()], passengerNames = new String[passengers.size()];
+        List<String> locationNames = new ArrayList<String>();
+        String[] passengerNames = new String[passengers.size()];
         int i = 0;
         for(TaxiPassenger pass : passengers){
         	passengerNames[i] = pass.name();
@@ -62,8 +64,7 @@ public class TaxiRmaxQDriver {
         }
         i = 0;
         for(TaxiLocation loc : locations){
-        	locs[i] = loc.name();//.colour;
-        	i++;
+        	locationNames.add(loc.name());//.colour;
         }
         
         
@@ -82,8 +83,9 @@ public class TaxiRmaxQDriver {
         TaskNode tdp = new PutDownTaskNode(dropoff);
         
         TaskNode[] navigateSubTasks = new TaskNode[]{te, tw, ts, tn};
-        
-        TaskNode navigate = new NavigateTaskNode(locs, navigateSubTasks, td);
+
+
+        TaskNode navigate = new NavigateTaskNode("navigate", locationNames, navigateSubTasks);
         TaskNode[] getNodeSubTasks = new TaskNode[]{tp,navigate};
         TaskNode[] putNodeSubTasks = new TaskNode[]{tdp,navigate};
         
@@ -123,6 +125,13 @@ public class TaxiRmaxQDriver {
 	}
 	
 	public static void main(String[] args) {
+		
+		
+		Long seed = 320949175L;
+		System.out.println("Using seed: seed");
+		RandomFactory.seedMapped(0, seed);
+		
+		
 		TaskNode root = setupHeirarcy();
 		HashableStateFactory hs = new SimpleHashableStateFactory();
 		
@@ -131,8 +140,11 @@ public class TaxiRmaxQDriver {
 //		env.addObservers(observer);
 		
 		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 3, 0.001);
+		System.out.println("beginning RMAXQ...");
  		Episode e = RmaxQ.runLearningEpisode(env);
 		e.write("output/episode_1");
+		
+		System.out.println(e.actionSequence);
 		
 		Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
 		new EpisodeSequenceVisualizer(v, domain, "output/" );

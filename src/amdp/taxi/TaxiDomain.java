@@ -996,23 +996,22 @@ public class TaxiDomain implements DomainGenerator{
 
         taxiPassengers.add(p1);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall wall0 = new TaxiMapWall(WALLCLASS+0,0, 5, 0, false);
+        TaxiMapWall wall1 = new TaxiMapWall(WALLCLASS+1,0, 5, 5, false);
+        TaxiMapWall wall2 = new TaxiMapWall(WALLCLASS+2,0, 5, 0, true);
+        TaxiMapWall wall3 = new TaxiMapWall(WALLCLASS+3,0, 5, 5, true);
+        TaxiMapWall wall4 = new TaxiMapWall(WALLCLASS+4,0, 2, 1, true);
+        TaxiMapWall wall5 = new TaxiMapWall(WALLCLASS+5,3, 5, 2, true);
+        TaxiMapWall wall6 = new TaxiMapWall(WALLCLASS+6,0, 2, 3, true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
-        walls.add(h1);
-        walls.add(h2);
-        walls.add(v1);
-        walls.add(v2);
-        walls.add(v3);
-        walls.add(v4);
-        walls.add(v5);
+        walls.add(wall0);
+        walls.add(wall1);
+        walls.add(wall2);
+        walls.add(wall3);
+        walls.add(wall4);
+        walls.add(wall5);
+        walls.add(wall6);
 
 
         State s = new TaxiState(walls,taxiPassengers,taxiLocations,taxiAgent);
@@ -1053,12 +1052,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1110,12 +1108,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1165,12 +1162,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);

@@ -27,6 +27,9 @@ public class TaxiAgent implements ObjectInstance{
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_FUEL, VAR_OCCUPIEDTAXI);
 
+    public TaxiAgent() {
+    	
+    }
 
     public TaxiAgent(String name, int x, int y, boolean taxiOccupied, int fuel) {
         this.name = name;
@@ -97,6 +100,6 @@ public class TaxiAgent implements ObjectInstance{
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        return name+"(agent), (" + x + ", " + y + "), occupied: " + taxiOccupied + ", fuel: " + fuel;
     }
 }

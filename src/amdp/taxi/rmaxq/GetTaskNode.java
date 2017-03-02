@@ -122,11 +122,6 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
 
             }
 
-            @Override
-            public int hashCode() {
-                String str = ACTION_GET + "_" + passenger;
-                return str.hashCode();
-            }
 
             @Override
             public String toString() {
