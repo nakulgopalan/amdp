@@ -23,7 +23,7 @@ public class TaxiAgent implements ObjectInstance{
     public boolean taxiOccupied;
     public int fuel = 0;
 
-    protected String name;
+    public String name;
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_FUEL, VAR_OCCUPIEDTAXI);
 

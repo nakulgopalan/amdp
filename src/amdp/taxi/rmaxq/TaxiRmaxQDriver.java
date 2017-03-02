@@ -127,7 +127,7 @@ public class TaxiRmaxQDriver {
 	public static void main(String[] args) {
 		
 		
-		Long seed = 320949175L;
+		Long seed = 320949199L;
 		System.out.println("Using seed: seed");
 		RandomFactory.seedMapped(0, seed);
 		

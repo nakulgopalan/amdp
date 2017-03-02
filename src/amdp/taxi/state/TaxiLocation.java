@@ -21,7 +21,7 @@ public class TaxiLocation implements ObjectInstance {
     public int y;
     public String colour;
 
-    String name;
+    public String name;
     private final static List<Object> keys = Arrays.<Object>asList(VAR_LOCATION, VAR_Y, VAR_X);
     
     public TaxiLocation() {

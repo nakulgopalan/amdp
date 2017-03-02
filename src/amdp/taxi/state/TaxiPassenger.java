@@ -27,7 +27,7 @@ public class TaxiPassenger implements ObjectInstance {
     public String originalSourceLocation;
 
 
-    protected String name;
+    public String name;
 
 
 

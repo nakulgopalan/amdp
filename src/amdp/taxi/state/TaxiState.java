@@ -429,6 +429,7 @@ public class TaxiState implements MutableOOState{
     public int locationInd(String oname){
         for (int i = 0; i < locations.size(); i++) {
         	TaxiLocation loc = locations.get(i);
+        	if (loc == null) { continue; }
         	if (loc.name().equals(oname)) {
         		return i;
         	}
@@ -439,6 +440,7 @@ public class TaxiState implements MutableOOState{
     public int locationIndWithColour(String colour){
         for (int i = 0; i < locations.size(); i++) {
         	TaxiLocation loc = locations.get(i);
+        	if (loc == null) { continue; }
         	if (loc.colour.equals(colour)) {
         		return i;
         	}
@@ -449,6 +451,7 @@ public class TaxiState implements MutableOOState{
     public int passengerInd(String oname){
         for (int i = 0; i < passengers.size(); i++) {
         	TaxiPassenger p = passengers.get(i);
+        	if (p == null) { continue; }
         	if (p.name().equals(oname)) {
         		return i;
         	}
@@ -459,6 +462,7 @@ public class TaxiState implements MutableOOState{
     public int wallInd(String oname){
         for (int i = 0; i < walls.size(); i++) {
         	TaxiMapWall wall = walls.get(i);
+        	if (wall == null) { continue; }
         	if (wall.name().equals(oname)) {
         		return i;
         	}
