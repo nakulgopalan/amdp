@@ -53,7 +53,7 @@ public class TaxiRmaxQDriver {
         TDGen.setIncludeFuel(false);
         OOSADomain td = TDGen.generateDomain();
         domain = td;
-        State s = TaxiDomain.getClassicState(td, false);
+        State s = TaxiDomain.getMiniState(td, false);
         env = new SimulatedEnvironment(td, s);
         
         List<TaxiPassenger> passengers = ((TaxiState)s).passengers;
