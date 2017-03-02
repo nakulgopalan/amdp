@@ -1,0 +1,28 @@
+!!burlap.behavior.singleagent.Episode
+actionSequence:
+- !!burlap.mdp.core.action.SimpleAction {name: north}
+rewardSequence: [-1.0]
+stateSequence:
+- !!amdp.taxi.state.TaxiState
+  locations: &id001
+  - {colour: yellow, x: 0, y: 0}
+  - {colour: red, x: 0, y: 4}
+  - {colour: blue, x: 3, y: 0}
+  - {colour: green, x: 4, y: 4}
+  passengers: &id002
+  - {goalLocation: red, inTaxi: false, justPickedUp: false, originalSourceLocation: blue,
+    pickedUpAtLeastOnce: false, x: 3, y: 0}
+  taxi: {fuel: 0, taxiOccupied: false, x: 0, y: 3}
+  walls: &id003
+  - {name: wall0, verticalWall: false, wallMax: 5, wallMin: 0, wallOffset: 0}
+  - {name: wall1, verticalWall: false, wallMax: 5, wallMin: 0, wallOffset: 5}
+  - {name: wall0, verticalWall: true, wallMax: 5, wallMin: 0, wallOffset: 0}
+  - {name: wall1, verticalWall: true, wallMax: 5, wallMin: 0, wallOffset: 5}
+  - {name: wall2, verticalWall: true, wallMax: 2, wallMin: 0, wallOffset: 1}
+  - {name: wall3, verticalWall: true, wallMax: 5, wallMin: 3, wallOffset: 2}
+  - {name: wall4, verticalWall: true, wallMax: 2, wallMin: 0, wallOffset: 3}
+- !!amdp.taxi.state.TaxiState
+  locations: *id001
+  passengers: *id002
+  taxi: {fuel: 0, taxiOccupied: false, x: 0, y: 4}
+  walls: *id003

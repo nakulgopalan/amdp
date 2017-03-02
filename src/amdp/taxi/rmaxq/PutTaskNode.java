@@ -32,12 +32,13 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
 
 	public static String ACTION_PUT = "put";
     ActionType putType;
-    protected String[] passenders;
-    public PutTaskNode(OOSADomain taxiL1Domain, String[] passes, TaskNode[] children){
+    protected String[] passenders, locations;
+    public PutTaskNode(OOSADomain taxiL1Domain, String[] passes, String[] locs, TaskNode[] children){
         this.domain = taxiL1Domain;
         this.name = ACTION_PUT;
         this.taskNodes = children;
-        passenders = passes;
+        this.passenders = passes;
+        this.locations = locs;
     }
 
     @Override
@@ -53,7 +54,9 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
     @Override
     public boolean terminal(State s, Action action) {
         String passName = ((PutType.PutAction)action).passenger;
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{passName}));
+        String locName = ((PutType.PutAction)action).location;
+        
+        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATLOC), new String[]{passName, locName}));
         return new GoalConditionTF(sc).isTerminal(s);
     }
 
@@ -61,9 +64,15 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
     @Override
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
-        for(String pass : passenders){
-        	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATGOALLOCATIONPF), new String[]{pass}));
-            gtList.add(new GroundedTask(this, new PutType.PutAction(pass), new GoalBasedRF(sc, 10)));
+        TaxiState stat = (TaxiState)s;
+        for(String loc : locations){
+	        for(String pass : passenders){
+	        	TaxiPassenger p = stat.touchPassenger(pass);
+	        	if(p.inTaxi){
+		        	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATLOC), new String[]{pass, loc}));
+		            gtList.add(new GroundedTask(this, new PutType.PutAction(pass, loc), new GoalBasedRF(sc, 10)));
+	        	}
+	        }
         }
         return gtList;
     }
@@ -85,8 +94,8 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
 
         @Override
         public Action associatedAction(String strRep) {
-//            return new PutAction(strRep.split("_")[0], strRep.split("_")[1]);
-            return new PutAction(strRep.split("_")[0]);
+            return new PutAction(strRep.split("_")[0], strRep.split("_")[1]);
+//            return new PutAction(strRep.split("_")[0]);
         }
 
         @Override
@@ -96,7 +105,7 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
             List<TaxiLocation> locations = ((TaxiState) s).locations;
             for (TaxiPassenger passenger : passengers) {
                 for (TaxiLocation loc : locations) {
-                    actions.add(new PutAction(passenger.name()));
+                    actions.add(new PutAction(passenger.name(), loc.colour));
                 }
 
             }
@@ -106,22 +115,22 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
         public static class PutAction implements Action {
 
             public String passenger;
-//            public String location;
+            public String location;
 
-            public PutAction(String passenger) {
+            public PutAction(String passenger, String location) {
                 this.passenger = passenger;
-//                this.location = location;
+                this.location = location;
             }
 
             @Override
             public String actionName() {
-//                return ACTION_PUT + "_" + passenger + "_" + location;
-                return ACTION_PUT + "_" + passenger;
+                return ACTION_PUT + "_" + passenger + "_" + location;
+//                return ACTION_PUT + "_" + passenger;
             }
 
             @Override
             public Action copy() {
-                return new PutAction(passenger);
+                return new PutAction(passenger, location);
             }
 
             @Override
@@ -131,13 +140,13 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
 
                 PutAction that = (PutAction) o;
 
-                return that.passenger.equals(passenger) ;//&& that.location.equals(location);
+                return that.passenger.equals(passenger) && that.location.equals(location);
 
             }
 
             @Override
             public int hashCode() {
-                String str = ACTION_PUT + "_" + passenger;// + "_" + location;
+                String str = ACTION_PUT + "_" + passenger + "_" + location;
                 return str.hashCode();
             }
 

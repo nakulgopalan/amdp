@@ -104,6 +104,8 @@ public class TaxiDomain implements DomainGenerator{
     public static final String								PASSENGERPICKUPPF = "passengerPickUpPF";
     public static final String								PASSENGERPUTDOWNPF = "passengerPutDownPF";
     public static final String								PASSENGERINTAXI = "passengerInTaxi";
+    public static final String								PASSENGERATLOC = "passAtLoc";
+    
     
     public static final String                              FUELLOCATION = "fuel";
 
@@ -354,7 +356,7 @@ public class TaxiDomain implements DomainGenerator{
         pfs.add(new PF_PickUp(PASSENGERPICKUPPF,domain,new String[]{}));
         pfs.add(new PF_PutDown(PASSENGERPUTDOWNPF,new String[]{}));
         pfs.add(new PF_TaxiAtLoc(TAXIATLOCATIONPF,new String[]{LOCATIONCLASS}));
-        pfs.add(new PF_PassengerInTaxi(PASSENGERINTAXI, new String[]{PASSENGERCLASS}));
+        pfs.add(new PF_PassAtLoc(PASSENGERATLOC, new String[]{LOCATIONCLASS, PASSENGERCLASS}));
         return pfs;
     }
 
@@ -826,6 +828,26 @@ public class TaxiDomain implements DomainGenerator{
         }
     }
 
+    public class PF_PassAtLoc extends PropositionalFunction{
+    	public PF_PassAtLoc(String name, String [] params){
+            super(name, params);
+        }
+    	
+    	public boolean isTrue(OOState s, String[] params) {
+    		String passName = params[0];
+    		String locColor = params[1];
+    		TaxiState state = (TaxiState)s;
+    		TaxiPassenger p = state.touchPassenger(passName);
+    		TaxiLocation l = state.touchLocation(state.locationIndWithColour(locColor));
+    		
+    		if(locColor.equals(l.colour))
+    			if(p.x == l.x && p.y == l.y)
+    				if(!p.inTaxi)
+    					return true;
+    		return false;
+    	}
+    }
+    
     //propositional function for put down
 
     public class PF_PutDown extends PropositionalFunction{

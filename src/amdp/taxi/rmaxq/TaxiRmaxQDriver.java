@@ -23,9 +23,13 @@ import burlap.behavior.singleagent.learning.LearningAgent;
 import burlap.behavior.singleagent.learning.LearningAgentFactory;
 import burlap.mdp.core.Domain;
 import burlap.mdp.core.TerminalFunction;
+import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.action.ActionUtils;
+import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.common.VisualActionObserver;
+import burlap.mdp.singleagent.environment.EnvironmentOutcome;
 import burlap.mdp.singleagent.environment.SimulatedEnvironment;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
@@ -36,7 +40,7 @@ import burlap.visualizer.Visualizer;
 public class TaxiRmaxQDriver {
 	
 	private static SimulatedEnvironment env;
-	private static Domain domain;
+	private static OOSADomain domain;
 	
 	public static TaskNode setupHeirarcy(){
         TerminalFunction taxiTF = new TaxiTerminationFunction();
@@ -45,7 +49,7 @@ public class TaxiRmaxQDriver {
         TaxiDomain TDGen = new TaxiDomain(taxiRF, taxiTF);
         
         TDGen.setTransitionDynamicsLikeFickleTaxiProlem();
-        TDGen.setFickleTaxi(true);
+        TDGen.setFickleTaxi(false);
         TDGen.setIncludeFuel(false);
         OOSADomain td = TDGen.generateDomain();
         domain = td;
@@ -88,7 +92,7 @@ public class TaxiRmaxQDriver {
         TaskNode[] putNodeSubTasks = new TaskNode[]{tdp,navigate};
         
         TaskNode getNode = new GetTaskNode(td, passengerNames, getNodeSubTasks);
-        TaskNode putNode = new PutTaskNode(td, passengerNames, putNodeSubTasks);
+        TaskNode putNode = new PutTaskNode(td, passengerNames, locs, putNodeSubTasks);
         
         TaskNode[] rootTasks = new TaskNode[]{getNode, putNode};
         
@@ -130,12 +134,17 @@ public class TaxiRmaxQDriver {
 //		observer.initGUI();
 //		env.addObservers(observer);
 		
-		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 3, 0.001);
+		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 3, 0.01);
  		Episode e = RmaxQ.runLearningEpisode(env);
+//		Episode e = new Episode(env.currentObservation());
+//		Action a = ActionUtils.allApplicableActionsForTypes(domain.getActionTypes(), env.currentObservation()).get(0);
+//		EnvironmentOutcome ec = env.executeAction(a);
+//		e.transition(ec);
 		e.write("output/episode_1");
 		
 		Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
 		new EpisodeSequenceVisualizer(v, domain, "output/" );
+
 	}
 
 }

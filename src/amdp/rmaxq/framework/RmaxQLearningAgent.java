@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.ranges.RangeException;
+
 import amdp.utilities.BoltzmannQPolicyWithCoolingSchedule;
 import burlap.behavior.policy.GreedyDeterministicQPolicy;
 import burlap.behavior.policy.GreedyQPolicy;
@@ -77,7 +79,6 @@ public class RmaxQLearningAgent implements LearningAgent {
 		this.root = root;
 		this.reward = new HashMap<GroundedTask, Map<HashableState,Double>>();
 		this.transition = new HashMap<GroundedTask, Map<HashableState, Map<HashableState, Double>>>();
-		this.reward = new HashMap<GroundedTask, Map<HashableState,Double>>();
 		this.totalReward = new HashMap<HashableState, Map<GroundedTask,Double>>();
 		this.actionCount = new HashMap<HashableState, Map<GroundedTask,Integer>>();
 		this.qProvider = new HashMap<GroundedTask, QProviderRmaxQ>();
@@ -103,7 +104,17 @@ public class RmaxQLearningAgent implements LearningAgent {
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
 		reachableStates = StateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
+
+		int repeats = 0;
+		while(reachableStates.size() > 0){
+			State s = reachableStates.remove(0);
+			if(reachableStates.contains(s)){
+				System.out.println(s);
+				repeats++;
+			}
+		}
 		
+		System.out.println("There are " + repeats + " repeats");
 		time = System.currentTimeMillis();
 		e = R_MaxQ(env.currentObservation(), rootSolve, e);
 		time = System.currentTimeMillis() - time;
@@ -455,7 +466,6 @@ public class RmaxQLearningAgent implements LearningAgent {
 		
 	protected void addChildTasks(GroundedTask task, State s){
 		if(!task.t.isTaskPrimitive()){
-			TaskNode[] children = ((NonPrimitiveTaskNode)task.t).getChildren();
 			List<GroundedTask> childGroundedTasks =  getTaskActions(task, s);
 			
 			for(GroundedTask gt : childGroundedTasks){
@@ -475,7 +485,9 @@ public class RmaxQLearningAgent implements LearningAgent {
 		}
 
 		terminal.put(t, terminals);
-		System.out.println(terminals.size());
+		System.out.println(terminals.size()+ " " + t.actionName());
+		if(terminals.size() == 0)
+			throw new RuntimeException("no terminal");
 		return terminals;
 	}
 	
