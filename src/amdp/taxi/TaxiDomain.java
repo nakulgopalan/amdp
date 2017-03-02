@@ -736,24 +736,31 @@ public class TaxiDomain implements DomainGenerator{
 
         @Override
         public boolean isTrue(OOState s, String... params) {
-            TaxiState ns = ((TaxiState)s).copy();
-            TaxiAgent taxi = ns.taxi;
+        	TaxiState state = (TaxiState) s;
+        	String locationName = params[0];
+        	TaxiLocation location = (TaxiLocation) state.object(locationName);
+        	int taxiX = state.taxi.x;
+        	int taxiY = state.taxi.y;
+    		if (taxiX == location.x && taxiY == location.y) {
+    			return true;
+    		}
+    		return false;
+//            TaxiState ns = ((TaxiState)s).copy();
+//            TaxiAgent taxi = ns.taxi;
 //            ObjectInstance o = s.getFirstObjectOfClass(TAXICLASS);
-            int xt = taxi.x;
-            int yt = taxi.y;
-            // params here are the name of a location like Location 1
-
-            boolean returnValue = false;
-            int i = ns.locationIndWithColour(params[0]);
-            TaxiLocation location = ns.touchLocation(i);//TaxiLocation)((TaxiState)s).object(params[0]);
-
-            int xl = location.x;
-            int yl = location.y;
-            if(xt==xl && yt==yl ){
-                returnValue = true;
-            }
-
-            return returnValue;
+//            int xt = taxi.x;
+//            int yt = taxi.y;
+//            // params here are the name of a location like Location 1
+//            boolean returnValue = false;
+//            int i = ns.locationIndWithColour(params[0]);
+//            TaxiLocation location = ns.touchLocation(i);//TaxiLocation)((TaxiState)s).object(params[0]);
+//            int xl = location.x;
+//            int yl = location.y;
+//            if(xt==xl && yt==yl ){
+//                returnValue = true;
+//            }
+//
+//            return returnValue;
         }
 
     }

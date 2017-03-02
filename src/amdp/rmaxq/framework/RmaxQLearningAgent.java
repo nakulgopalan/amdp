@@ -10,7 +10,7 @@ import burlap.behavior.policy.GreedyDeterministicQPolicy;
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.SolverDerivedPolicy;
 import burlap.behavior.singleagent.Episode;
-//import burlap.behavior.singleagent.auxiliary.StateReachability;
+import burlap.behavior.singleagent.auxiliary.StateReachability;
 import burlap.behavior.singleagent.learning.LearningAgent;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
@@ -472,6 +472,10 @@ public class RmaxQLearningAgent implements LearningAgent {
 		for(State s :reachableStates){
 			if(t.t.terminal(s, t.getAction()))
 				terminals.add(s);
+		}
+		System.out.println(terminals.size());
+		if (terminals.size() < 1) {
+			System.out.println(t.actionName());//throw new RuntimeException("Warning: no terminal states found");
 		}
 
 		terminal.put(t, terminals);

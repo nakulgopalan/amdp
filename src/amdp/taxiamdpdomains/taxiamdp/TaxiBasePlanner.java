@@ -37,6 +37,7 @@ import burlap.mdp.singleagent.model.FactoredModel;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.mdp.stochasticgames.agent.AgentFactory;
+import burlap.shell.visual.VisualExplorer;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
 
@@ -92,13 +93,13 @@ public class TaxiBasePlanner {
 
 
         tdGen.setTransitionDynamicsLikeFickleTaxiProlem();
-        tdGen.setFickleTaxi(true);
+        tdGen.setFickleTaxi(false);
         tdGen.setIncludeFuel(false);
 
 
         OOSADomain td = tdGen.generateDomain();
 
-        OOSADomain tdEnv = tdGen.generateDomain();
+//        OOSADomain tdEnv = tdGen.generateDomain();
 
 
         State startState;
@@ -120,6 +121,8 @@ public class TaxiBasePlanner {
                 startState = TaxiDomain.getComplexState(false);
             }
         }
+        
+        System.out.println("Choosing random start? " + randomStart +", Choosing single passenger? " + singlePassenger);
 
 
 //        startState = TaxiDomain.getComplexState(false);
@@ -136,17 +139,27 @@ public class TaxiBasePlanner {
 
 
 
-        SimulatedEnvironment envN = new SimulatedEnvironment(tdEnv, startState);
+//        SimulatedEnvironment envN = new SimulatedEnvironment(tdEnv, startState);
 
-        Episode e = PolicyUtils.rollout(p, startState, td.getModel(),maxTrajectoryLength);
+        Episode e = PolicyUtils.rollout(p, startState, td.getModel(), maxTrajectoryLength);
 
 //        Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
 //        List<Episode> eaList = new ArrayList<Episode>();
 //        eaList.add(e);
 //        new EpisodeSequenceVisualizer(v, td, eaList);
+    	//create visualizer and explorer
+        
+		Visualizer v = TaxiVisualizer.getVisualizer(5,5);
+		VisualExplorer exp = new VisualExplorer(td, v, startState);
 
+		//set control keys to use w-s-a-d
+		exp.addKeyAction("w", TaxiDomain.ACTION_NORTH, "");
+		exp.addKeyAction("s", TaxiDomain.ACTION_SOUTH, "");
+		exp.addKeyAction("a", TaxiDomain.ACTION_WEST, "");
+		exp.addKeyAction("d", TaxiDomain.ACTION_EAST, "");
+		exp.addKeyAction("e", TaxiDomain.ACTION_PICKUP, "");
 
-
+		exp.initGUI();
 
 //        System.out.println("actions taken: " + e.actionSequence.size());
 //        System.out.println("rewards: " + e.discountedReturn(1.));
