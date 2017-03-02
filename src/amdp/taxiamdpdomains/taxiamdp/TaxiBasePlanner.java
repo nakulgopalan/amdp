@@ -149,17 +149,18 @@ public class TaxiBasePlanner {
 //        new EpisodeSequenceVisualizer(v, td, eaList);
     	//create visualizer and explorer
         
-		Visualizer v = TaxiVisualizer.getVisualizer(5,5);
-		VisualExplorer exp = new VisualExplorer(td, v, startState);
-
-		//set control keys to use w-s-a-d
-		exp.addKeyAction("w", TaxiDomain.ACTION_NORTH, "");
-		exp.addKeyAction("s", TaxiDomain.ACTION_SOUTH, "");
-		exp.addKeyAction("a", TaxiDomain.ACTION_WEST, "");
-		exp.addKeyAction("d", TaxiDomain.ACTION_EAST, "");
-		exp.addKeyAction("e", TaxiDomain.ACTION_PICKUP, "");
-
-		exp.initGUI();
+//		Visualizer v = TaxiVisualizer.getVisualizer(5,5);
+//		VisualExplorer exp = new VisualExplorer(td, v, startState);
+//
+//		//set control keys to use w-s-a-d
+//		exp.addKeyAction("w", TaxiDomain.ACTION_NORTH, "");
+//		exp.addKeyAction("s", TaxiDomain.ACTION_SOUTH, "");
+//		exp.addKeyAction("a", TaxiDomain.ACTION_WEST, "");
+//		exp.addKeyAction("d", TaxiDomain.ACTION_EAST, "");
+//		exp.addKeyAction("e", TaxiDomain.ACTION_PICKUP, "");
+//		exp.addKeyAction("f", TaxiDomain.ACTION_DROPOFF, "");
+//
+//		exp.initGUI();
 
 //        System.out.println("actions taken: " + e.actionSequence.size());
 //        System.out.println("rewards: " + e.discountedReturn(1.));

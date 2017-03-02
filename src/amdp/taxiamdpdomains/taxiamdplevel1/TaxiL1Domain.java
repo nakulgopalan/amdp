@@ -310,7 +310,7 @@ public class TaxiL1Domain implements DomainGenerator {
             List<TaxiL1Location> locations = ((TaxiL1State)s).locations;
             for(TaxiL1Location location: locations){
                 if(!location.colour.equals(ON_ROAD)){
-                    actions.add(new NavigateAction(location.colour));
+                    actions.add(new NavigateAction(location.name()));
                 }
             }
             return actions;

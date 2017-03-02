@@ -62,7 +62,7 @@ public class TaxiRmaxQDriver {
         }
         i = 0;
         for(TaxiLocation loc : locations){
-        	locs[i] = loc.colour;
+        	locs[i] = loc.name();//.colour;
         	i++;
         }
         

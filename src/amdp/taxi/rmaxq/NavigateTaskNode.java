@@ -102,6 +102,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
             public String location;
 
             public NavigateAction(String location) {
+            	System.out.println("NAVACTION: " + location);
                 this.location= location;
             }
 

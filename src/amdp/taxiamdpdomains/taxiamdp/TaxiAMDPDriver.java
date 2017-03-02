@@ -254,7 +254,7 @@ public class TaxiAMDPDriver {
         for(BoundedRTDPForTests b:brtdpList){
             System.out.println(b.getNumberOfBellmanUpdates());
         }
-        System.out.println("random start state: " + randomStart);
+//        System.out.println("random start state: " + randomStart);
 
 
 

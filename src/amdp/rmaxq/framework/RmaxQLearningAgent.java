@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import amdp.utilities.BoltzmannQPolicyWithCoolingSchedule;
+import amdp.utilities.BoundedStateReachability;
 import burlap.behavior.policy.GreedyDeterministicQPolicy;
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.SolverDerivedPolicy;
@@ -102,7 +103,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 		this.initialState = env.currentObservation();
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
-		reachableStates = StateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
+		reachableStates = BoundedStateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
 		
 		time = System.currentTimeMillis();
 		e = R_MaxQ(env.currentObservation(), rootSolve, e);
@@ -473,10 +474,8 @@ public class RmaxQLearningAgent implements LearningAgent {
 			if(t.t.terminal(s, t.getAction()))
 				terminals.add(s);
 		}
-		System.out.println(terminals.size());
-		if (terminals.size() < 1) {
-			System.out.println(t.actionName());//throw new RuntimeException("Warning: no terminal states found");
-		}
+		
+		System.out.println(t.actionName() + " " + terminals.size());
 
 		terminal.put(t, terminals);
 		System.out.println(terminals.size());
