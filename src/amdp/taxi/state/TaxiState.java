@@ -29,6 +29,10 @@ public class TaxiState implements MutableOOState{
 
 //    public boolean pickUpLeagal = false;
 //    public boolean dropOffLeagal = false;
+    
+    public TaxiState() {
+    	
+    }
 
     public TaxiState(List<TaxiMapWall> walls, List<TaxiPassenger> passengers, List<TaxiLocation> locations, TaxiAgent taxi) {
         this.walls = walls;
@@ -44,70 +48,72 @@ public class TaxiState implements MutableOOState{
 
     @Override
     public MutableOOState removeObject(String objectName) {
-        if(objectName.equals(taxi.name())){
-            new RuntimeException("Cannot remove taxi agent object from state.");
-        }
-
-        int indL = this.locationInd(objectName);
-        if(indL != -1) {
-            //copy on write
-            touchLocations().remove(indL);
-            return this;
-        }
-
-        int indP = this.passengerInd(objectName);
-        if(indP != -1){
-            //copy on write
-            touchPassengers().remove(indP);
-            return this;
-        }
-
-        int indW = this.wallInd(objectName);
-        if(indW == -1) {
-            //copy on write
-            touchWalls().remove(indW);
-            return this;
-        }
-
-        return this;
+    	throw new RuntimeException("not implemented");
+//        if(objectName.equals(taxi.name())){
+//            new RuntimeException("Cannot remove taxi agent object from state.");
+//        }
+//
+//        int indL = this.locationInd(objectName);
+//        if(indL != -1) {
+//            //copy on write
+//            touchLocations().remove(indL);
+//            return this;
+//        }
+//
+//        int indP = this.passengerInd(objectName);
+//        if(indP != -1){
+//            //copy on write
+//            touchPassengers().remove(indP);
+//            return this;
+//        }
+//
+//        int indW = this.wallInd(objectName);
+//        if(indW == -1) {
+//            //copy on write
+//            touchWalls().remove(indW);
+//            return this;
+//        }
+//
+//        return this;
     }
 
     @Override
     public MutableOOState renameObject(String objectName, String newName) {
-        if(objectName.equals(taxi.name())){
-            TaxiAgent nagent = taxi.copyWithName(newName);
-            this.taxi= nagent;
-            return this;
-        }
-
-        int indL = this.locationInd(objectName);
-        if(indL != -1) {
-            //copy on write
-            TaxiLocation nloc = this.locations.get(indL).copyWithName(newName);
-            touchLocations().remove(indL);
-            locations.add(indL, nloc);
-            return this;
-        }
-
-        int indP = this.passengerInd(objectName);
-        if(indP != -1){
-            //copy on write
-            TaxiPassenger nloc = this.passengers.get(indP).copyWithName(newName);
-            touchLocations().remove(indP);
-            passengers.add(indP, nloc);
-            return this;
-        }
-
-        int indW = this.wallInd(objectName);
-        if(indW == -1) {
-            //copy on write
-            TaxiMapWall nWall = this.walls.get(indW).copyWithName(newName);
-            touchLocations().remove(indW);
-            walls.add(indW, nWall);
-            return this;
-        }
-
-        throw new RuntimeException("Cannot find object: " + objectName);
+    	throw new RuntimeException("not implemented");
+//        if(objectName.equals(taxi.name())){
+//            TaxiAgent nagent = taxi.copyWithName(newName);
+//            this.taxi= nagent;
+//            return this;
+//        }
+//
+//        int indL = this.locationInd(objectName);
+//        if(indL != -1) {
+//            //copy on write
+//            TaxiLocation nloc = this.locations.get(indL).copyWithName(newName);
+//            touchLocations().remove(indL);
+//            locations.add(indL, nloc);
+//            return this;
+//        }
+//
+//        int indP = this.passengerInd(objectName);
+//        if(indP != -1){
+//            //copy on write
+//            TaxiPassenger nloc = this.passengers.get(indP).copyWithName(newName);
+//            touchLocations().remove(indP);
+//            passengers.add(indP, nloc);
+//            return this;
+//        }
+//
+//        int indW = this.wallInd(objectName);
+//        if(indW == -1) {
+//            //copy on write
+//            TaxiMapWall nWall = this.walls.get(indW).copyWithName(newName);
+//            touchLocations().remove(indW);
+//            walls.add(indW, nWall);
+//            return this;
+//        }
+//
+//        throw new RuntimeException("Cannot find object: " + objectName);
     }
 
     @Override
@@ -117,39 +123,45 @@ public class TaxiState implements MutableOOState{
 
     @Override
     public ObjectInstance object(String objectName) {
-        if(objectName.equals(taxi.name())){
-            TaxiAgent nagent = taxi.copy();
-            return nagent;
-        }
-
-        int indL = this.locationInd(objectName);
-        if(indL != -1) {
-            //copy on write
-            TaxiLocation nloc = this.locations.get(indL).copy();
-            return nloc;
-        }
-
-        int indP = this.passengerInd(objectName);
-        if(indP != -1){
-            //copy on write
-            TaxiPassenger nloc = this.passengers.get(indP).copy();
-            return nloc;
-        }
-
-        int indW = this.wallInd(objectName);
-        if(indW != -1) {
-            //copy on write
-            TaxiMapWall nWall = this.walls.get(indW).copy();
-            return nWall;
-        }
-
-        throw new RuntimeException("Cannot find object: " + objectName);
+		for (ObjectInstance object : objects()) {
+			if (objectName.equals(object.name())) {
+				return object;
+			}
+		}
+		throw new RuntimeException("not implemented " + objectName);
+//        if(objectName.equals(taxi.name())){
+//            TaxiAgent nagent = taxi.copy();
+//            return nagent;
+//        }
+//
+//        int indL = this.locationInd(objectName);
+//        if(indL != -1) {
+//            //copy on write
+//            TaxiLocation nloc = this.locations.get(indL).copy();
+//            return nloc;
+//        }
+//
+//        int indP = this.passengerInd(objectName);
+//        if(indP != -1){
+//            //copy on write
+//            TaxiPassenger nloc = this.passengers.get(indP).copy();
+//            return nloc;
+//        }
+//
+//        int indW = this.wallInd(objectName);
+//        if(indW != -1) {
+//            //copy on write
+//            TaxiMapWall nWall = this.walls.get(indW).copy();
+//            return nWall;
+//        }
+//
+//        throw new RuntimeException("Cannot find object: " + objectName);
 
     }
 
     @Override
     public List<ObjectInstance> objects() {
-        List<ObjectInstance> obs = new ArrayList<ObjectInstance>(1+locations.size()+walls.size()+passengers.size());
+        List<ObjectInstance> obs = new ArrayList<ObjectInstance>();
         obs.add(taxi);
         obs.addAll(locations);
         obs.addAll(passengers);
@@ -193,106 +205,107 @@ public class TaxiState implements MutableOOState{
 
     @Override
     public MutableState set(Object variableKey, Object value) {
-        OOVariableKey key = OOStateUtilities.generateKey(variableKey);
-
-        if(key.obName.equals(taxi.name())){
-            if(key.obVarKey.equals(VAR_X)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchTaxi().x = iv;
-            }
-            else if(key.obVarKey.equals(VAR_Y)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchTaxi().y = iv;
-            }
-            else if(key.obVarKey.equals(VAR_FUEL)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchTaxi().fuel = iv;
-            }
-            else if(key.obVarKey.equals(VAR_OCCUPIEDTAXI)){
-                boolean vBool = StateUtilities.stringOrBoolean(value).booleanValue();
-                touchTaxi().taxiOccupied=vBool;
-            }
-            else{
-                throw new RuntimeException("Unknown variable key in TaxiState for TaxiAgent: " + variableKey);
-            }
-            return this;
-        }
-        int indL = locationInd(key.obName);
-        if(indL!=-1){
-            if(key.obVarKey.equals(VAR_X)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchLocation(indL).x = iv;
-            }
-            else if(key.obVarKey.equals(VAR_Y)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchLocation(indL).y = iv;
-            }
-            else if(key.obVarKey.equals(VAR_LOCATION)){
-                if(value instanceof String){
-                    touchLocation(indL).colour = (String) value;
-                }
-                else throw new RuntimeException("Variable value must be String for key VAR_LOCATION in TaxiState for TaxiLocation: " + value.toString());
-
-            }
-            else{
-                throw new RuntimeException("Unknown variable key in TaxiState for TaxiLocation: " + variableKey);
-            }
-
-            return this;
-
-        }
-        int indP = passengerInd(key.obName);
-        if(indP!=-1){
-            if(key.obVarKey.equals(VAR_X)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchPassenger(indP).x = iv;
-            }
-            else if(key.obVarKey.equals(VAR_Y)){
-                int iv = StateUtilities.stringOrNumber(value).intValue();
-                touchPassenger(indP).y = iv;
-            }
-            else if(key.obVarKey.equals(VAR_GOALLOCATION)){
-                if(value instanceof String){
-                    touchPassenger(indP).goalLocation = (String) value;
-                }
-                else throw new RuntimeException("Variable value must be String for key VAR_GOALLOCATION in TaxiState for TaxiPassenger: " + value.toString());
-
-
-            }
-            else if(key.obVarKey.equals(VAR_INTAXI)){
-                touchPassenger(indP).inTaxi = StateUtilities.stringOrBoolean(value).booleanValue();
-            }
-            else if(key.obVarKey.equals(VAR_JUSTPICKEDUP)){
-                touchPassenger(indP).justPickedUp = StateUtilities.stringOrBoolean(value).booleanValue();
-            }
-            else{
-                throw new RuntimeException("Unknown variable key " + variableKey);
-            }
-
-            return this;
-
-        }
-        int indW = wallInd(key.obName);
-        if(indW!=-1){
-            int iv = StateUtilities.stringOrNumber(value).intValue();
-            if(key.obVarKey.equals(VAR_WALLMAX)){
-                touchWall(indW).wallMax = iv;
-            }
-            else if(key.obVarKey.equals(VAR_WALLMIN)){
-                touchWall(indW).wallMin= iv;
-            }
-            else if(key.obVarKey.equals(VAR_WALLOFFSET)){
-                touchWall(indW).wallOffset = iv;
-            }
-            else{
-                throw new RuntimeException("Unknown variable key " + variableKey);
-            }
-
-            return this;
-        }
-
-
-        throw new RuntimeException("Unknown variable key " + variableKey);
+    	throw new RuntimeException("not implemented");
+//        OOVariableKey key = OOStateUtilities.generateKey(variableKey);
+//
+//        if(key.obName.equals(taxi.name())){
+//            if(key.obVarKey.equals(VAR_X)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchTaxi().x = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_Y)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchTaxi().y = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_FUEL)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchTaxi().fuel = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_OCCUPIEDTAXI)){
+//                boolean vBool = StateUtilities.stringOrBoolean(value).booleanValue();
+//                touchTaxi().taxiOccupied=vBool;
+//            }
+//            else{
+//                throw new RuntimeException("Unknown variable key in TaxiState for TaxiAgent: " + variableKey);
+//            }
+//            return this;
+//        }
+//        int indL = locationInd(key.obName);
+//        if(indL!=-1){
+//            if(key.obVarKey.equals(VAR_X)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchLocation(indL).x = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_Y)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchLocation(indL).y = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_LOCATION)){
+//                if(value instanceof String){
+//                    touchLocation(indL).colour = (String) value;
+//                }
+//                else throw new RuntimeException("Variable value must be String for key VAR_LOCATION in TaxiState for TaxiLocation: " + value.toString());
+//
+//            }
+//            else{
+//                throw new RuntimeException("Unknown variable key in TaxiState for TaxiLocation: " + variableKey);
+//            }
+//
+//            return this;
+//
+//        }
+//        int indP = passengerInd(key.obName);
+//        if(indP!=-1){
+//            if(key.obVarKey.equals(VAR_X)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchPassenger(indP).x = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_Y)){
+//                int iv = StateUtilities.stringOrNumber(value).intValue();
+//                touchPassenger(indP).y = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_GOALLOCATION)){
+//                if(value instanceof String){
+//                    touchPassenger(indP).goalLocation = (String) value;
+//                }
+//                else throw new RuntimeException("Variable value must be String for key VAR_GOALLOCATION in TaxiState for TaxiPassenger: " + value.toString());
+//
+//
+//            }
+//            else if(key.obVarKey.equals(VAR_INTAXI)){
+//                touchPassenger(indP).inTaxi = StateUtilities.stringOrBoolean(value).booleanValue();
+//            }
+//            else if(key.obVarKey.equals(VAR_JUSTPICKEDUP)){
+//                touchPassenger(indP).justPickedUp = StateUtilities.stringOrBoolean(value).booleanValue();
+//            }
+//            else{
+//                throw new RuntimeException("Unknown variable key " + variableKey);
+//            }
+//
+//            return this;
+//
+//        }
+//        int indW = wallInd(key.obName);
+//        if(indW!=-1){
+//            int iv = StateUtilities.stringOrNumber(value).intValue();
+//            if(key.obVarKey.equals(VAR_WALLMAX)){
+//                touchWall(indW).wallMax = iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_WALLMIN)){
+//                touchWall(indW).wallMin= iv;
+//            }
+//            else if(key.obVarKey.equals(VAR_WALLOFFSET)){
+//                touchWall(indW).wallOffset = iv;
+//            }
+//            else{
+//                throw new RuntimeException("Unknown variable key " + variableKey);
+//            }
+//
+//            return this;
+//        }
+//
+//
+//        throw new RuntimeException("Unknown variable key " + variableKey);
     }
 
     @Override
@@ -302,23 +315,24 @@ public class TaxiState implements MutableOOState{
 
     @Override
     public Object get(Object variableKey) {
-        OOVariableKey key = OOStateUtilities.generateKey(variableKey);
-        if(key.obName.equals(taxi.name())){
-            return taxi.get(key.obVarKey);
-        }
-        int indL = this.locationInd(key.obName);
-        if(indL != -1){
-            return locations.get(indL).get(key.obVarKey);
-        }
-        int indP = this.passengerInd(key.obName);
-        if(indP != -1){
-            return passengers.get(indP).get(key.obVarKey);
-        }
-        int indW = this.wallInd(key.obName);
-        if(indW != -1){
-            return walls.get(indW).get(key.obVarKey);
-        }
-        throw new RuntimeException("Cannot find object " + key.obName);
+    	throw new RuntimeException("not implemented");
+//        OOVariableKey key = OOStateUtilities.generateKey(variableKey);
+//        if(key.obName.equals(taxi.name())){
+//            return taxi.get(key.obVarKey);
+//        }
+//        int indL = this.locationInd(key.obName);
+//        if(indL != -1){
+//            return locations.get(indL).get(key.obVarKey);
+//        }
+//        int indP = this.passengerInd(key.obName);
+//        if(indP != -1){
+//            return passengers.get(indP).get(key.obVarKey);
+//        }
+//        int indW = this.wallInd(key.obName);
+//        if(indW != -1){
+//            return walls.get(indW).get(key.obVarKey);
+//        }
+//        throw new RuntimeException("Cannot find object " + key.obName);
     }
 
     @Override
@@ -328,7 +342,12 @@ public class TaxiState implements MutableOOState{
 
     @Override
     public String toString() {
-        return OOStateUtilities.ooStateToString(this);
+        String out = "";
+        for (ObjectInstance o : this.objects()) {
+        	if (o == null) continue;
+        	out += o.toString() + "\n";
+        }
+        return out;
     }
 
     public TaxiAgent touchTaxi(){
@@ -342,12 +361,13 @@ public class TaxiState implements MutableOOState{
     }
 
     public List<TaxiLocation> deepTouchLocations(){
-        List<TaxiLocation> nlocs = new ArrayList<TaxiLocation>(locations.size());
-        for(TaxiLocation loc : locations){
-            nlocs.add(loc.copy());
-        }
-        locations = nlocs;
-        return locations;
+    	throw new RuntimeException("not implemented");
+//        List<TaxiLocation> nlocs = new ArrayList<TaxiLocation>(locations.size());
+//        for(TaxiLocation loc : locations){
+//            nlocs.add(loc.copy());
+//        }
+//        locations = nlocs;
+//        return locations;
     }
 
     public TaxiLocation touchLocation(int ind){
@@ -363,12 +383,13 @@ public class TaxiState implements MutableOOState{
     }
 
     public List<TaxiPassenger> deepTouchPassengers(){
-        List<TaxiPassenger> nps = new ArrayList<TaxiPassenger>(passengers.size());
-        for(TaxiPassenger p : passengers){
-            nps.add(p.copy());
-        }
-        passengers= nps;
-        return passengers;
+    	throw new RuntimeException("not implemented");
+//        List<TaxiPassenger> nps = new ArrayList<TaxiPassenger>(passengers.size());
+//        for(TaxiPassenger p : passengers){
+//            nps.add(p.copy());
+//        }
+//        passengers= nps;
+//        return passengers;
     }
 
     public TaxiPassenger touchPassenger(int ind){
@@ -380,10 +401,7 @@ public class TaxiState implements MutableOOState{
 
     public TaxiPassenger touchPassenger(String passName){
         int ind = passengerInd(passName);
-        TaxiPassenger n = passengers.get(ind).copy();
-        touchPassengers().remove(ind);
-        passengers.add(ind, n);
-        return n;
+        return touchPassenger(ind);
     }
 
     public List<TaxiMapWall> touchWalls(){
@@ -392,12 +410,13 @@ public class TaxiState implements MutableOOState{
     }
 
     public List<TaxiMapWall> deepTouchWalls(){
-        List<TaxiMapWall> nws = new ArrayList<TaxiMapWall>(walls.size());
-        for(TaxiMapWall w : walls){
-            nws.add(w.copy());
-        }
-        walls = nws;
-        return walls;
+    	throw new RuntimeException("not implemented");
+//        List<TaxiMapWall> nws = new ArrayList<TaxiMapWall>(walls.size());
+//        for(TaxiMapWall w : walls){
+//            nws.add(w.copy());
+//        }
+//        walls = nws;
+//        return walls;
     }
 
     public TaxiMapWall touchWall(int ind){
@@ -408,46 +427,47 @@ public class TaxiState implements MutableOOState{
     }
 
     public int locationInd(String oname){
-        int ind = -1;
-        for(int i = 0; i < locations.size(); i++){
-            if(locations.get(i).name().equals(oname)){
-                ind = i;
-                break;
-            }
+        for (int i = 0; i < locations.size(); i++) {
+        	TaxiLocation loc = locations.get(i);
+        	if (loc == null) { continue; }
+        	if (loc.name().equals(oname)) {
+        		return i;
+        	}
         }
-        return ind;
+        return -1;
     }
 
     public int locationIndWithColour(String colour){
-        int ind = -1;
-        for(int i = 0; i < locations.size(); i++){
-            if(locations.get(i).colour.equals(colour)){
-                ind = i;
-                break;
-            }
+        for (int i = 0; i < locations.size(); i++) {
+        	TaxiLocation loc = locations.get(i);
+        	if (loc == null) { continue; }
+        	if (loc.colour.equals(colour)) {
+        		return i;
+        	}
         }
-        return ind;
+        return -1;
     }
 
     public int passengerInd(String oname){
-        int ind = -1;
-        for(int i = 0; i < passengers.size(); i++){
-            if(passengers.get(i).name().equals(oname)){
-                ind = i;
-                break;
-            }
+        for (int i = 0; i < passengers.size(); i++) {
+        	TaxiPassenger p = passengers.get(i);
+        	if (p == null) { continue; }
+        	if (p.name().equals(oname)) {
+        		return i;
+        	}
         }
-        return ind;
+        return -1;
     }
 
     public int wallInd(String oname){
-        int ind = -1;
-        for(int i = 0; i < walls.size(); i++){
-            if(walls.get(i).name().equals(oname)){
-                ind = i;
-                break;
-            }
+        for (int i = 0; i < walls.size(); i++) {
+        	TaxiMapWall wall = walls.get(i);
+        	if (wall == null) { continue; }
+        	if (wall.name().equals(oname)) {
+        		return i;
+        	}
         }
-        return ind;
+        return -1;
     }
 }
+

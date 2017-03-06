@@ -104,17 +104,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
 		reachableStates = StateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
-
-		int repeats = 0;
-		while(reachableStates.size() > 0){
-			State s = reachableStates.remove(0);
-			if(reachableStates.contains(s)){
-				System.out.println(s);
-				repeats++;
-			}
-		}
 		
-		System.out.println("There are " + repeats + " repeats");
 		time = System.currentTimeMillis();
 		e = R_MaxQ(env.currentObservation(), rootSolve, e);
 		time = System.currentTimeMillis() - time;

@@ -15,10 +15,13 @@ import burlap.mdp.auxiliary.common.GoalConditionTF;
 import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.action.SimpleAction;
 import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.common.GoalBasedRF;
+import burlap.mdp.singleagent.common.UniformCostRF;
+import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 
 /**
@@ -32,13 +35,19 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
 	public static final String ACTION_NAVIGATE = "navigate";
     protected List<GroundedTask> gtasks;
     protected String[] locations;
-    
+    protected List<GroundedTask> gts;
     public NavigateTaskNode(String[] locs, TaskNode[] children, OOSADomain dom){
         gtasks = new ArrayList<GroundedTask>();
         name = ACTION_NAVIGATE;
         this.domain = dom;
         locations = locs;
     	this.taskNodes = children;
+    	
+    	gts = new ArrayList<GroundedTask>();
+    	RewardFunction urf = new UniformCostRF();
+    	for( String loc : locations){
+        	gts.add(new GroundedTask(this, new SimpleAction(ACTION_NAVIGATE + "_" + loc), urf));
+        }
     }
 
     @Override
@@ -49,93 +58,28 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
 
     @Override
     public boolean terminal(State s, Action action) {
-        String location = ((NavigateType.NavigateAction)action).location;
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{location}));
-        return new GoalConditionTF(sc).isTerminal(s);
+        String goal = action.actionName().split("_")[1];
+        TaxiState st = (TaxiState) s;
+        int tx = st.taxi.x, ty = st.taxi.y;
+        for(TaxiLocation l : st.locations){
+        	if(l.name().equals(goal)){
+        		if(tx == l.x && ty == l.y){
+        			return true;
+        		}
+        	}
+        }
+        return false;
     }
 
     @Override
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
+        for(GroundedTask gt  : gts){
+        	if(!terminal(s, gt.getAction())){
+        		gtList.add(gt);
+        	}
+        }
         
-        for( String loc : locations){
-        	StateConditionTest st = new GroundedPropSC
-        			(new GroundedProp(domain.propFunction(TaxiDomain.TAXIATLOCATIONPF), new String[]{loc}));
-        	
-            gtList.add(new GroundedTask(this, new NavigateType.NavigateAction(loc), new GoalBasedRF(st, 10) ));
-        }
         return gtList;
-    }
-    
-    public static class NavigateType implements ActionType {
-
-
-        public NavigateType() {
-//            actions = new ArrayList<Action>(locations.size());
-//            for(String location : locations){
-//                actions.add(new NavigateAction(location));
-//            }
-        }
-
-        @Override
-        public String typeName() {
-            return ACTION_NAVIGATE;
-        }
-
-        @Override
-        public Action associatedAction(String strRep) {
-            return new NavigateAction(strRep);
-        }
-
-        @Override
-        public List<Action> allApplicableActions(State s) {
-            List<Action> actions = new ArrayList<Action>();
-            List<TaxiLocation> locations = ((TaxiState)s).locations;
-            for(TaxiLocation location: locations){
-                actions.add(new NavigateAction(location.colour));
-            }
-            return actions;
-        }
-
-        public static class NavigateAction implements Action{
-
-            public String location;
-
-            public NavigateAction(String location) {
-                this.location= location;
-            }
-
-            @Override
-            public String actionName() {
-                return ACTION_NAVIGATE + "_" + location;
-            }
-
-            @Override
-            public Action copy() {
-                return new NavigateAction(location);
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if(this == o) return true;
-                if(o == null || getClass() != o.getClass()) return false;
-
-                NavigateAction that = (NavigateAction) o;
-
-                return that.location.equals(location) ;
-
-            }
-
-            @Override
-            public int hashCode() {
-                String str = ACTION_NAVIGATE + "_" + location;
-                return str.hashCode();
-            }
-
-            @Override
-            public String toString() {
-                return this.actionName();
-            }
-        }
     }
 }

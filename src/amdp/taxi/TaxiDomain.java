@@ -104,8 +104,6 @@ public class TaxiDomain implements DomainGenerator{
     public static final String								PASSENGERPICKUPPF = "passengerPickUpPF";
     public static final String								PASSENGERPUTDOWNPF = "passengerPutDownPF";
     public static final String								PASSENGERINTAXI = "passengerInTaxi";
-    public static final String								PASSENGERATLOC = "passAtLoc";
-    
     
     public static final String                              FUELLOCATION = "fuel";
 
@@ -356,7 +354,7 @@ public class TaxiDomain implements DomainGenerator{
         pfs.add(new PF_PickUp(PASSENGERPICKUPPF,domain,new String[]{}));
         pfs.add(new PF_PutDown(PASSENGERPUTDOWNPF,new String[]{}));
         pfs.add(new PF_TaxiAtLoc(TAXIATLOCATIONPF,new String[]{LOCATIONCLASS}));
-        pfs.add(new PF_PassAtLoc(PASSENGERATLOC, new String[]{LOCATIONCLASS, PASSENGERCLASS}));
+        pfs.add(new PF_PassengerInTaxi(PASSENGERINTAXI, new String[]{PASSENGERCLASS}));
         return pfs;
     }
 
@@ -738,24 +736,31 @@ public class TaxiDomain implements DomainGenerator{
 
         @Override
         public boolean isTrue(OOState s, String... params) {
-            TaxiState ns = ((TaxiState)s).copy();
-            TaxiAgent taxi = ns.taxi;
+        	TaxiState state = (TaxiState) s;
+        	String locationName = params[0];
+        	TaxiLocation location = (TaxiLocation) state.object(locationName);
+        	int taxiX = state.taxi.x;
+        	int taxiY = state.taxi.y;
+    		if (taxiX == location.x && taxiY == location.y) {
+    			return true;
+    		}
+    		return false;
+//            TaxiState ns = ((TaxiState)s).copy();
+//            TaxiAgent taxi = ns.taxi;
 //            ObjectInstance o = s.getFirstObjectOfClass(TAXICLASS);
-            int xt = taxi.x;
-            int yt = taxi.y;
-            // params here are the name of a location like Location 1
-
-            boolean returnValue = false;
-            int i = ns.locationIndWithColour(params[0]);
-            TaxiLocation location = ns.touchLocation(i);//TaxiLocation)((TaxiState)s).object(params[0]);
-
-            int xl = location.x;
-            int yl = location.y;
-            if(xt==xl && yt==yl ){
-                returnValue = true;
-            }
-
-            return returnValue;
+//            int xt = taxi.x;
+//            int yt = taxi.y;
+//            // params here are the name of a location like Location 1
+//            boolean returnValue = false;
+//            int i = ns.locationIndWithColour(params[0]);
+//            TaxiLocation location = ns.touchLocation(i);//TaxiLocation)((TaxiState)s).object(params[0]);
+//            int xl = location.x;
+//            int yl = location.y;
+//            if(xt==xl && yt==yl ){
+//                returnValue = true;
+//            }
+//
+//            return returnValue;
         }
 
     }
@@ -828,26 +833,6 @@ public class TaxiDomain implements DomainGenerator{
         }
     }
 
-    public class PF_PassAtLoc extends PropositionalFunction{
-    	public PF_PassAtLoc(String name, String [] params){
-            super(name, params);
-        }
-    	
-    	public boolean isTrue(OOState s, String[] params) {
-    		String passName = params[0];
-    		String locColor = params[1];
-    		TaxiState state = (TaxiState)s;
-    		TaxiPassenger p = state.touchPassenger(passName);
-    		TaxiLocation l = state.touchLocation(state.locationIndWithColour(locColor));
-    		
-    		if(locColor.equals(l.colour))
-    			if(p.x == l.x && p.y == l.y)
-    				if(!p.inTaxi)
-    					return true;
-    		return false;
-    	}
-    }
-    
     //propositional function for put down
 
     public class PF_PutDown extends PropositionalFunction{
@@ -1011,70 +996,22 @@ public class TaxiDomain implements DomainGenerator{
 
         taxiPassengers.add(p1);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
-
-        List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
-        walls.add(h1);
-        walls.add(h2);
-        walls.add(v1);
-        walls.add(v2);
-        walls.add(v3);
-        walls.add(v4);
-        walls.add(v5);
-
-
-        State s = new TaxiState(walls,taxiPassengers,taxiLocations,taxiAgent);
-
-
-        return s;
-
-    }
-
-    public static State getMiniState(Domain domain, boolean usesFuel){
-
-        TaxiAgent taxiAgent = new TaxiAgent(TAXICLASS+0,1,1);
-
-        TaxiPassenger p1 = new TaxiPassenger(PASSENGERCLASS+0,0, 2, RED, YELLOW);
-
-        TaxiLocation l0 = new TaxiLocation(0, 0,LOCATIONCLASS+0,YELLOW);
-        TaxiLocation l1 = new TaxiLocation(0, 2,LOCATIONCLASS+1,RED);
-
-        List<TaxiLocation> taxiLocations = new ArrayList<TaxiLocation>();
-        List<TaxiPassenger> taxiPassengers= new ArrayList<TaxiPassenger>();
-
-        if(usesFuel){
-            TaxiLocation lFuel = new TaxiLocation(2,1,LOCATIONCLASS+4,FUEL);
-            taxiLocations.add(lFuel);
-        }
-        taxiLocations.add(l0);
-        taxiLocations.add(l1);
-
-        taxiPassengers.add(p1);
-
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 3, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 3, 3,false);
-//
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 3, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 3, 3,true);
-//        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-//        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-//        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall wall0 = new TaxiMapWall(WALLCLASS+0,0, 5, 0, false);
+        TaxiMapWall wall1 = new TaxiMapWall(WALLCLASS+1,0, 5, 5, false);
+        TaxiMapWall wall2 = new TaxiMapWall(WALLCLASS+2,0, 5, 0, true);
+        TaxiMapWall wall3 = new TaxiMapWall(WALLCLASS+3,0, 5, 5, true);
+        TaxiMapWall wall4 = new TaxiMapWall(WALLCLASS+4,0, 2, 1, true);
+        TaxiMapWall wall5 = new TaxiMapWall(WALLCLASS+5,3, 5, 2, true);
+        TaxiMapWall wall6 = new TaxiMapWall(WALLCLASS+6,0, 2, 3, true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
-        walls.add(h1);
-        walls.add(h2);
-        walls.add(v1);
-        walls.add(v2);
-//        walls.add(v3);
-//        walls.add(v4);
-//        walls.add(v5);
+        walls.add(wall0);
+        walls.add(wall1);
+        walls.add(wall2);
+        walls.add(wall3);
+        walls.add(wall4);
+        walls.add(wall5);
+        walls.add(wall6);
 
 
         State s = new TaxiState(walls,taxiPassengers,taxiLocations,taxiAgent);
@@ -1115,12 +1052,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1172,12 +1108,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1227,12 +1162,11 @@ public class TaxiDomain implements DomainGenerator{
 
         TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
         TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
-
-        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
-        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
-        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
-        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
-        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+        TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+2,0, 5, 0,true);
+        TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+3,0, 5, 5,true);
+        TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+4,0, 2, 1,true);
+        TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+5,3, 5, 2,true);
+        TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+6,0, 2, 3,true);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);

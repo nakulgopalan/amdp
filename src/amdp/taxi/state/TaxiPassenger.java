@@ -1,15 +1,19 @@
 package amdp.taxi.state;
 
-import amdp.taxi.TaxiDomain;
-import burlap.mdp.core.oo.state.OOStateUtilities;
-import burlap.mdp.core.oo.state.ObjectInstance;
-import burlap.mdp.core.state.annotations.DeepCopyState;
+import static amdp.taxi.TaxiDomain.VAR_GOALLOCATION;
+import static amdp.taxi.TaxiDomain.VAR_INTAXI;
+import static amdp.taxi.TaxiDomain.VAR_JUSTPICKEDUP;
+import static amdp.taxi.TaxiDomain.VAR_ORIGINALSOURCELOCATION;
+import static amdp.taxi.TaxiDomain.VAR_PICKEDUPATLEASTONCE;
+import static amdp.taxi.TaxiDomain.VAR_X;
+import static amdp.taxi.TaxiDomain.VAR_Y;
 
 import java.util.Arrays;
 import java.util.List;
 
-
-import static amdp.taxi.TaxiDomain.*;
+import amdp.taxi.TaxiDomain;
+import burlap.mdp.core.oo.state.ObjectInstance;
+import burlap.mdp.core.state.annotations.DeepCopyState;
 
 /**
  * Created by ngopalan on 6/14/16.
@@ -27,13 +31,15 @@ public class TaxiPassenger implements ObjectInstance {
     public String originalSourceLocation;
 
 
-    protected String name;
+    public String name;
 
 
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_JUSTPICKEDUP, VAR_INTAXI, VAR_GOALLOCATION, VAR_PICKEDUPATLEASTONCE ,VAR_ORIGINALSOURCELOCATION);
 
-
+    public TaxiPassenger() {
+    	
+    }
 
     public TaxiPassenger(String name, int x, int y,  boolean inTaxi,
                          boolean justPickedUp, String goalLocation,
@@ -71,9 +77,8 @@ public class TaxiPassenger implements ObjectInstance {
 
     @Override
     public TaxiPassenger  copyWithName(String objectName) {
-        TaxiPassenger nPassenger = this.copy();
-        nPassenger.name = objectName;
-        return nPassenger;
+        return new TaxiPassenger(objectName, x, y, inTaxi, justPickedUp,
+                goalLocation, pickedUpAtLeastOnce, originalSourceLocation);
     }
 
     @Override
@@ -121,6 +126,12 @@ public class TaxiPassenger implements ObjectInstance {
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        String out = "";
+        out += name+"(passenger), (" + x + ", " + y + ")";
+        out += ", goalLocation: " + goalLocation;
+        out += ", originalLocation: " + originalSourceLocation;
+        out += ", justPickedUp: " + justPickedUp;
+        out += ", pickedUpAtLeastOnce:" + pickedUpAtLeastOnce;
+        return out;
     }
 }

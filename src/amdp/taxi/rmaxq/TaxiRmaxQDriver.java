@@ -53,7 +53,7 @@ public class TaxiRmaxQDriver {
         TDGen.setIncludeFuel(false);
         OOSADomain td = TDGen.generateDomain();
         domain = td;
-        State s = TaxiDomain.getMiniState(td, false);
+        State s = TaxiDomain.getClassicState(td, false);
         env = new SimulatedEnvironment(td, s);
         
         List<TaxiPassenger> passengers = ((TaxiState)s).passengers;
@@ -66,10 +66,9 @@ public class TaxiRmaxQDriver {
         }
         i = 0;
         for(TaxiLocation loc : locations){
-        	locs[i] = loc.colour;
+        	locs[i] = loc.name();
         	i++;
         }
-        
         
         ActionType east = td.getAction(TaxiDomain.ACTION_EAST);
         ActionType west = td.getAction(TaxiDomain.ACTION_WEST);
@@ -130,16 +129,8 @@ public class TaxiRmaxQDriver {
 		TaskNode root = setupHeirarcy();
 		HashableStateFactory hs = new SimpleHashableStateFactory();
 		
-//		VisualActionObserver observer = new VisualActionObserver(root.getDomain(), TaxiVisualizer.getVisualizer(5, 5));
-//		observer.initGUI();
-//		env.addObservers(observer);
-		
 		LearningAgent RmaxQ = new RmaxQLearningAgent(root, hs, 100, 3, 0.01);
  		Episode e = RmaxQ.runLearningEpisode(env);
-//		Episode e = new Episode(env.currentObservation());
-//		Action a = ActionUtils.allApplicableActionsForTypes(domain.getActionTypes(), env.currentObservation()).get(0);
-//		EnvironmentOutcome ec = env.executeAction(a);
-//		e.transition(ec);
 		e.write("output/episode_1");
 		
 		Visualizer v = TaxiVisualizer.getVisualizer(5, 5);

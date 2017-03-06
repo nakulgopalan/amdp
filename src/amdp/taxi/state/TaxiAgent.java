@@ -1,16 +1,16 @@
 package amdp.taxi.state;
 
-import amdp.taxi.TaxiDomain;
-import burlap.mdp.core.oo.state.OOStateUtilities;
-import burlap.mdp.core.oo.state.ObjectInstance;
-import burlap.mdp.core.state.State;
-import burlap.mdp.core.state.annotations.DeepCopyState;
+import static amdp.taxi.TaxiDomain.VAR_FUEL;
+import static amdp.taxi.TaxiDomain.VAR_OCCUPIEDTAXI;
+import static amdp.taxi.TaxiDomain.VAR_X;
+import static amdp.taxi.TaxiDomain.VAR_Y;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static amdp.taxi.TaxiDomain.*;
-import static amdp.taxi.TaxiDomain.VAR_GOALLOCATION;
+import amdp.taxi.TaxiDomain;
+import burlap.mdp.core.oo.state.ObjectInstance;
+import burlap.mdp.core.state.annotations.DeepCopyState;
 
 /**
  * Created by ngopalan on 6/14/16.
@@ -23,10 +23,13 @@ public class TaxiAgent implements ObjectInstance{
     public boolean taxiOccupied;
     public int fuel = 0;
 
-    protected String name;
+    public String name;
 
     private final static List<Object> keys = Arrays.<Object>asList(VAR_X, VAR_Y, VAR_FUEL, VAR_OCCUPIEDTAXI);
 
+    public TaxiAgent() {
+    	
+    }
 
     public TaxiAgent(String name, int x, int y, boolean taxiOccupied, int fuel) {
         this.name = name;
@@ -97,6 +100,6 @@ public class TaxiAgent implements ObjectInstance{
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        return name+"(agent), (" + x + ", " + y + "), occupied: " + taxiOccupied + ", fuel: " + fuel;
     }
 }

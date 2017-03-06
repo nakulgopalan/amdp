@@ -1,15 +1,15 @@
 package amdp.taxi.state;
 
-import amdp.taxi.TaxiDomain;
-import burlap.mdp.core.oo.state.OOStateUtilities;
-import burlap.mdp.core.oo.state.ObjectInstance;
-import burlap.mdp.core.state.State;
-import burlap.mdp.core.state.annotations.DeepCopyState;
+import static amdp.taxi.TaxiDomain.VAR_LOCATION;
+import static amdp.taxi.TaxiDomain.VAR_X;
+import static amdp.taxi.TaxiDomain.VAR_Y;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static amdp.taxi.TaxiDomain.*;
+import amdp.taxi.TaxiDomain;
+import burlap.mdp.core.oo.state.ObjectInstance;
+import burlap.mdp.core.state.annotations.DeepCopyState;
 
 /**
  * Created by ngopalan on 6/14/16.
@@ -21,8 +21,13 @@ public class TaxiLocation implements ObjectInstance {
     public int y;
     public String colour;
 
-    String name;
+    public String name;
     private final static List<Object> keys = Arrays.<Object>asList(VAR_LOCATION, VAR_Y, VAR_X);
+    
+    public TaxiLocation() {
+    	
+    }
+    
     public TaxiLocation(int x, int y, String name, String colour) {
         this.x = x;
         this.y = y;
@@ -42,9 +47,7 @@ public class TaxiLocation implements ObjectInstance {
 
     @Override
     public TaxiLocation copyWithName(String objectName) {
-        TaxiLocation nLocation = this.copy();
-        nLocation.name = objectName;
-        return nLocation;
+        return new TaxiLocation(this.x, this.y, objectName, this.colour);
     }
 
     @Override
@@ -78,6 +81,6 @@ public class TaxiLocation implements ObjectInstance {
 
     @Override
     public String toString() {
-        return OOStateUtilities.objectInstanceToString(this);
+        return name+"(location), (" + x + ", " + y + "), colour: " + colour;
     }
 }

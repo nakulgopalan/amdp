@@ -12,15 +12,19 @@ import amdp.taxi.state.TaxiLocation;
 import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
 import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
+import amdp.taxiamdpdomains.taxiamdplevel1.taxil1state.TaxiL1Location;
 import amdp.taxiamdpdomains.taxiamdplevel2.TaxiL2Domain;
 import burlap.mdp.auxiliary.common.GoalConditionTF;
 import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
 import burlap.mdp.core.action.ActionType;
+import burlap.mdp.core.action.SimpleAction;
 import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.common.GoalBasedRF;
+import burlap.mdp.singleagent.common.UniformCostRF;
+import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
 
 /**
@@ -33,128 +37,64 @@ public class PutTaskNode extends NonPrimitiveTaskNode{
 	public static String ACTION_PUT = "put";
     ActionType putType;
     protected String[] passenders, locations;
+    protected List<GroundedTask> gts;
     public PutTaskNode(OOSADomain taxiL1Domain, String[] passes, String[] locs, TaskNode[] children){
         this.domain = taxiL1Domain;
         this.name = ACTION_PUT;
         this.taskNodes = children;
         this.passenders = passes;
         this.locations = locs;
+        
+        gts = new ArrayList<GroundedTask>();
+        RewardFunction urf = new UniformCostRF();
+        for(String pass : passenders){
+        	for(String loc : locations){
+        		gts.add(new GroundedTask(this, new SimpleAction(ACTION_PUT + "_" + pass +"_" + loc), urf));
+        	}
+        }
     }
 
     @Override
     public Object parametersSet(State s) {
         List<String[]> params = new ArrayList<String[]>();
-        List<Action> gtActions = putType.allApplicableActions(s);
-        for(Action a:gtActions){
-            params.add(new String[]{a.actionName().split("_")[1],a.actionName().split("_")[2]});
+        for(String loc: locations){
+        	for(String pass: passenders){
+        		params.add(new String[]{loc,pass});
+        		}
         }
         return null;
     }
 
     @Override
     public boolean terminal(State s, Action action) {
-        String passName = ((PutType.PutAction)action).passenger;
-        String locName = ((PutType.PutAction)action).location;
-        
-        StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATLOC), new String[]{passName, locName}));
-        return new GoalConditionTF(sc).isTerminal(s);
+        String[] act = action.actionName().split("_");
+        String passName = act[1], goalName = act[2];
+        TaxiState st = (TaxiState)s;
+        for(TaxiPassenger p : st.passengers){
+        	for(TaxiLocation l : st.locations){
+        		if(p.name().equals(passName) && l.name().equals(goalName)){
+        			if(p.x == l.x && p.y == l.y){
+        				return true;
+        			}
+        		}
+        	}
+        }
+        return false;
     }
 
 
     @Override
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
-        TaxiState stat = (TaxiState)s;
-        for(String loc : locations){
-	        for(String pass : passenders){
-	        	TaxiPassenger p = stat.touchPassenger(pass);
-	        	if(p.inTaxi){
-		        	StateConditionTest sc =  new GroundedPropSC(new GroundedProp(domain.propFunction(TaxiDomain.PASSENGERATLOC), new String[]{pass, loc}));
-		            gtList.add(new GroundedTask(this, new PutType.PutAction(pass, loc), new GoalBasedRF(sc, 10)));
-	        	}
-	        }
+        TaxiState st = (TaxiState)s;
+        for(GroundedTask gt: gts){
+        	String pass = gt.actionName().split("_")[1];
+        	TaxiPassenger p = st.passengers.get(st.passengerInd(pass));
+        	if(p.inTaxi && !terminal(s, gt.getAction())){
+        		gtList.add(gt);
+        	}
         }
         return gtList;
     }
     
-    public static class PutType implements ActionType {
-
-
-        public PutType() {
-//            actions = new ArrayList<Action>(locations.size());
-//            for(String location : locations){
-//                actions.add(new NavigateAction(location));
-//            }
-        }
-
-        @Override
-        public String typeName() {
-            return ACTION_PUT;
-        }
-
-        @Override
-        public Action associatedAction(String strRep) {
-            return new PutAction(strRep.split("_")[0], strRep.split("_")[1]);
-//            return new PutAction(strRep.split("_")[0]);
-        }
-
-        @Override
-        public List<Action> allApplicableActions(State s) {
-            List<Action> actions = new ArrayList<Action>();
-            List<TaxiPassenger> passengers = ((TaxiState) s).passengers;
-            List<TaxiLocation> locations = ((TaxiState) s).locations;
-            for (TaxiPassenger passenger : passengers) {
-                for (TaxiLocation loc : locations) {
-                    actions.add(new PutAction(passenger.name(), loc.colour));
-                }
-
-            }
-            return actions;
-        }
-
-        public static class PutAction implements Action {
-
-            public String passenger;
-            public String location;
-
-            public PutAction(String passenger, String location) {
-                this.passenger = passenger;
-                this.location = location;
-            }
-
-            @Override
-            public String actionName() {
-                return ACTION_PUT + "_" + passenger + "_" + location;
-//                return ACTION_PUT + "_" + passenger;
-            }
-
-            @Override
-            public Action copy() {
-                return new PutAction(passenger, location);
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-
-                PutAction that = (PutAction) o;
-
-                return that.passenger.equals(passenger) && that.location.equals(location);
-
-            }
-
-            @Override
-            public int hashCode() {
-                String str = ACTION_PUT + "_" + passenger + "_" + location;
-                return str.hashCode();
-            }
-
-            @Override
-            public String toString() {
-                return this.actionName();
-            }
-        }
-    }
-
 }
