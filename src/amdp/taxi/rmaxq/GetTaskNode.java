@@ -3,24 +3,14 @@ package amdp.taxi.rmaxq;
 import java.util.ArrayList;
 import java.util.List;
 
-import amdp.amdpframework.GroundedPropSC;
 import amdp.rmaxq.framework.GroundedTask;
 import amdp.rmaxq.framework.NonPrimitiveTaskNode;
 import amdp.rmaxq.framework.TaskNode;
-import amdp.taxi.TaxiDomain;
 import amdp.taxi.state.TaxiPassenger;
 import amdp.taxi.state.TaxiState;
-import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
-import amdp.taxiamdpdomains.taxiamdplevel2.TaxiL2Domain;
-import burlap.mdp.auxiliary.common.GoalConditionTF;
-import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
-import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.action.SimpleAction;
-import burlap.mdp.core.action.UniversalActionType;
-import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
-import burlap.mdp.singleagent.common.GoalBasedRF;
 import burlap.mdp.singleagent.common.UniformCostRF;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
@@ -34,8 +24,9 @@ public class GetTaskNode extends NonPrimitiveTaskNode{
 	public static final String ACTION_GET = "get";
 	protected List<GroundedTask> gts;
     protected String[] passengers;
-    public GetTaskNode(OOSADomain taxiL2Domain, String[] passes,  TaskNode[] children){
-        this.domain = taxiL2Domain;
+    
+    public GetTaskNode(OOSADomain taxiDomain, String[] passes, TaskNode[] children){
+        this.domain = taxiDomain;
         this.name = ACTION_GET;
         this.taskNodes = children;
         this.passengers = passes;

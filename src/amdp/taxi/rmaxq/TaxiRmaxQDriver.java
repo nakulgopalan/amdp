@@ -48,7 +48,6 @@ public class TaxiRmaxQDriver {
 
         TaxiDomain TDGen = new TaxiDomain(taxiRF, taxiTF);
         
-        TDGen.setTransitionDynamicsLikeFickleTaxiProlem();
         TDGen.setFickleTaxi(false);
         TDGen.setIncludeFuel(false);
         OOSADomain td = TDGen.generateDomain();

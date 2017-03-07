@@ -8,6 +8,7 @@ import java.util.Map;
 import org.w3c.dom.ranges.RangeException;
 
 import amdp.utilities.BoltzmannQPolicyWithCoolingSchedule;
+import amdp.utilities.BoundedStateReachability;
 import burlap.behavior.policy.GreedyDeterministicQPolicy;
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.SolverDerivedPolicy;
@@ -103,7 +104,7 @@ public class RmaxQLearningAgent implements LearningAgent {
 		this.initialState = env.currentObservation();
 		Episode e = new Episode(env.currentObservation());
 		GroundedTask rootSolve = root.getApplicableGroundedTasks(env.currentObservation()).get(0);
-		reachableStates = StateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
+		reachableStates = BoundedStateReachability.getReachableStates(initialState, root.getDomain(), hashingFactory, 10000);
 		
 		time = System.currentTimeMillis();
 		e = R_MaxQ(env.currentObservation(), rootSolve, e);

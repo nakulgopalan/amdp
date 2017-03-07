@@ -3,23 +3,14 @@ package amdp.taxi.rmaxq;
 import java.util.ArrayList;
 import java.util.List;
 
-import amdp.amdpframework.GroundedPropSC;
 import amdp.rmaxq.framework.GroundedTask;
 import amdp.rmaxq.framework.NonPrimitiveTaskNode;
 import amdp.rmaxq.framework.TaskNode;
-import amdp.taxi.TaxiDomain;
 import amdp.taxi.state.TaxiLocation;
 import amdp.taxi.state.TaxiState;
-import amdp.taxiamdpdomains.taxiamdplevel1.TaxiL1Domain;
-import burlap.mdp.auxiliary.common.GoalConditionTF;
-import burlap.mdp.auxiliary.stateconditiontest.StateConditionTest;
 import burlap.mdp.core.action.Action;
-import burlap.mdp.core.action.ActionType;
 import burlap.mdp.core.action.SimpleAction;
-import burlap.mdp.core.action.UniversalActionType;
-import burlap.mdp.core.oo.propositional.GroundedProp;
 import burlap.mdp.core.state.State;
-import burlap.mdp.singleagent.common.GoalBasedRF;
 import burlap.mdp.singleagent.common.UniformCostRF;
 import burlap.mdp.singleagent.model.RewardFunction;
 import burlap.mdp.singleagent.oo.OOSADomain;
@@ -33,12 +24,10 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
 //    OOSADomain l0Domain;
 
 	public static final String ACTION_NAVIGATE = "navigate";
-    protected List<GroundedTask> gtasks;
     protected String[] locations;
     protected List<GroundedTask> gts;
     public NavigateTaskNode(String[] locs, TaskNode[] children, OOSADomain dom){
-        gtasks = new ArrayList<GroundedTask>();
-        name = ACTION_NAVIGATE;
+        this.name = ACTION_NAVIGATE;
         this.domain = dom;
         locations = locs;
     	this.taskNodes = children;
@@ -63,9 +52,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
         int tx = st.taxi.x, ty = st.taxi.y;
         for(TaxiLocation l : st.locations){
         	if(l.name().equals(goal)){
-        		if(tx == l.x && ty == l.y){
-        			return true;
-        		}
+        		return tx == l.x && ty == l.y;
         	}
         }
         return false;
@@ -74,7 +61,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
     @Override
     public List<GroundedTask> getApplicableGroundedTasks(State s) {
         List<GroundedTask> gtList = new ArrayList<GroundedTask>();
-        for(GroundedTask gt  : gts){
+        for(GroundedTask gt : gts){
         	if(!terminal(s, gt.getAction())){
         		gtList.add(gt);
         	}

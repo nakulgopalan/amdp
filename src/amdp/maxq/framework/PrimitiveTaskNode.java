@@ -81,4 +81,9 @@ public abstract class PrimitiveTaskNode implements TaskNode {
         System.err.println("Tried to get hashable state when not set at the node!");
         return null;
     }
+    
+
+    public String name(){
+    	return this.actionType.typeName();
+    }
 }

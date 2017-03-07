@@ -1,4 +1,4 @@
-package amdp.rmaxq.framework;
+package amdp.utilities;
 
 import burlap.behavior.policy.EnumerablePolicy;
 import burlap.behavior.policy.support.ActionProb;
@@ -24,14 +24,14 @@ import java.util.*;
  * @author James MacGlashan
  *
  */
-public class StateReachability {
+public class BoundedStateReachability {
 	
 	/**
 	 * The debugID used for making calls to {@link burlap.debugtools.DPrint}.
 	 */
 	public static final int			debugID = 837493;
 	
-	private StateReachability() {
+	private BoundedStateReachability() {
 	    // do nothing
 	}
 	
