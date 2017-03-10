@@ -32,6 +32,7 @@ public class PickupL1TaskNode extends NonPrimitiveTaskNode{
     public PickupL1TaskNode(ActionType pickupType, OOSADomain taxiL1Domain, OOSADomain taxiL0Domain, TaskNode[] children){
         this.pickupType = pickupType;
 //        this.oosaDomain = taxiL1Domain;
+        this.name = pickupType.typeName();
         this.oosaDomain = taxiL0Domain;
         this.oosaDomain.clearActionTypes();
         this.oosaDomain.addActionTypes(

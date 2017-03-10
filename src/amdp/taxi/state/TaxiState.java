@@ -37,6 +37,7 @@ public class TaxiState implements MutableOOState{
         this.taxi = taxi;
     }
 
+
     @Override
     public MutableOOState addObject(ObjectInstance o) {
         throw new RuntimeException("Cannot add objects to state.");

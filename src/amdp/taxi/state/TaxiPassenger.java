@@ -123,4 +123,25 @@ public class TaxiPassenger implements ObjectInstance {
     public String toString() {
         return OOStateUtilities.objectInstanceToString(this);
     }
+
+    @Override
+    public boolean equals(Object object){
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof TaxiPassenger) {
+            TaxiPassenger taxiPassenger = (TaxiPassenger) object;
+            if((this.inTaxi==taxiPassenger.inTaxi && this.x==taxiPassenger.x && this.y==taxiPassenger.y && this.goalLocation.equals(taxiPassenger.goalLocation)
+                    && this.name.equals(taxiPassenger.name) && this.originalSourceLocation.equals(taxiPassenger.originalSourceLocation)
+                    && this.pickedUpAtLeastOnce==taxiPassenger.pickedUpAtLeastOnce && this.justPickedUp==taxiPassenger.justPickedUp)){
+                return true;
+            }
+        }
+
+        return false;
+
+
+    }
+
+
 }

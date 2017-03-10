@@ -54,6 +54,10 @@ public abstract class NonPrimitiveTaskNode implements TaskNode{
         this.childTaskNodes = childTaskNodes;
     }
 
+    public OOSADomain getDomain(){
+        return this.oosaDomain;
+    }
+
 
     public abstract Object parametersSet(State s);
 

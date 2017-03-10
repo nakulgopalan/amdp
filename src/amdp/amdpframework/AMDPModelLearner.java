@@ -1,8 +1,11 @@
 package amdp.amdpframework;
 
-		import burlap.behavior.policy.Policy;
-		import burlap.behavior.valuefunction.QProvider;
-		import burlap.mdp.core.state.State;
+import burlap.behavior.policy.Policy;
+import burlap.behavior.valuefunction.QProvider;
+import burlap.mdp.core.action.Action;
+import burlap.mdp.core.state.State;
+
+import java.util.List;
 
 /**
  * This is a Policy Generating Interface for AMDPs. The purpose of such policy generators is to
@@ -13,12 +16,10 @@ package amdp.amdpframework;
  *
  */
 
-public interface AMDPPolicyGenerator {
+public interface AMDPModelLearner extends AMDPPolicyGenerator{
 
 
-	public Policy generatePolicy(State s, GroundedTask groundedTask);
+    public void updateModel(State s, Action a, List<Double> rewards, State sPrime, GroundedTask gt);
 
-	public State generateAbstractState(State s);
 
-	public QProvider getQProvider(State s, GroundedTask groundedTask);
 }

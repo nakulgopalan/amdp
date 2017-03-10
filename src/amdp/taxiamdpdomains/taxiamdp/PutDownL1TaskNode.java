@@ -30,6 +30,7 @@ public class PutDownL1TaskNode extends NonPrimitiveTaskNode{
     public PutDownL1TaskNode(ActionType putDownType, OOSADomain taxiL1Domain, OOSADomain taxiL0Domain, TaskNode[] children){
         this.putDownType = putDownType;
         this.oosaDomain = taxiL0Domain;
+        this.name = putDownType.typeName();
 //        this.l0Domain = taxiL0Domain;
 //        this.oosaDomain = taxiL0Domain;
         this.oosaDomain.clearActionTypes();

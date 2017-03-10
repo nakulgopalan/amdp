@@ -98,4 +98,22 @@ public class TaxiMapWall implements ObjectInstance {
     public String toString() {
         return OOStateUtilities.objectInstanceToString(this);
     }
+
+
+    @Override
+    public boolean equals(Object object){
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof TaxiMapWall) {
+            TaxiMapWall wallObject = (TaxiMapWall) object;
+            if((this.verticalWall ==wallObject.verticalWall && this.wallMax==wallObject.wallMax && this.wallMin == wallObject.wallMin && this.wallOffset==wallObject.wallOffset && this.name().equals(wallObject.name()) )){
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
 }

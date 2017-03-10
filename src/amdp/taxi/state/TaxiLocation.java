@@ -80,4 +80,21 @@ public class TaxiLocation implements ObjectInstance {
     public String toString() {
         return OOStateUtilities.objectInstanceToString(this);
     }
+
+    @Override
+    public boolean equals(Object object){
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof TaxiLocation) {
+            TaxiLocation locationObject = (TaxiLocation) object;
+            if((this.x==locationObject.x && this.y==locationObject.y && this.colour.equals(locationObject.colour) && this.name.equals(locationObject.name))){
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
 }

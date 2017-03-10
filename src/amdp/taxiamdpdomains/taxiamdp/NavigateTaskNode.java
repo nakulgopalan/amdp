@@ -32,6 +32,7 @@ public class NavigateTaskNode extends NonPrimitiveTaskNode{
 
     public NavigateTaskNode(ActionType navigateType, OOSADomain taxiL1Domain, OOSADomain taxiL0Domain, TaskNode[] children){
         this.navigateType = navigateType;
+        this.name = navigateType.typeName();
         this.oosaDomain = taxiL0Domain;
 //        this.l0Domain = taxiL0Domain;
         this.oosaDomain.clearActionTypes();

@@ -58,6 +58,7 @@ public class GroundedTask {
 
     public OOSADomain groundedDomain(){
         // only non-primitive task nodes have domains
+//        System.out.println("GroundedTask: name: "+ this.getAction().actionName());
         if(!(t instanceof NonPrimitiveTaskNode)){
             System.err.println("Domain queried from primitive node which is not possible!");
         }

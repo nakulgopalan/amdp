@@ -7,6 +7,7 @@ import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
 import burlap.behavior.singleagent.learning.tdmethods.QLearning;
 import burlap.behavior.singleagent.planning.stochastic.rtdp.BoundedRTDP;
+import burlap.behavior.singleagent.planning.stochastic.valueiteration.ValueIteration;
 import burlap.behavior.valuefunction.ConstantValueFunction;
 import burlap.debugtools.RandomFactory;
 import burlap.mdp.auxiliary.DomainGenerator;
@@ -717,7 +718,13 @@ public class TaxiDomain implements DomainGenerator{
             // params here are the name of a location like Location 1
 
             boolean returnValue = false;
-            int i = ns.locationIndWithColour(params[0]);
+            int i=ns.locationIndWithColour(params[0]);
+
+            if(i==-1){
+                i=ns.locationInd(params[0]);
+            }
+
+//            System.out.println(params[0]);
             TaxiLocation location = ns.touchLocation(i);//TaxiLocation)((TaxiState)s).object(params[0]);
 
             int xl = location.x;
@@ -962,14 +969,16 @@ public class TaxiDomain implements DomainGenerator{
 
         taxiPassengers.add(p1);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
+
 
         TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
         TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
         TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
         TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
         TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+
+        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+5,0, 5, 0,false);
+        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+6,0, 5, 5,false);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1017,14 +1026,16 @@ public class TaxiDomain implements DomainGenerator{
         taxiPassengers.add(p1);
 //        taxiPassengers.add(p2);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
 
         TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
         TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
         TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
         TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
         TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+
+
+        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+5,0, 5, 0,false);
+        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+6,0, 5, 5,false);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1074,14 +1085,16 @@ public class TaxiDomain implements DomainGenerator{
         TaxiPassenger p1 = new TaxiPassenger(PASSENGERCLASS+0,tempStartLocation.x, tempStartLocation.y, tempGoalLocation.colour, tempStartLocation.colour);
         taxiPassengers.add(p1);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
+
 
         TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
         TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
         TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
         TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
         TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+
+        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+5,0, 5, 0,false);
+        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+6,0, 5, 5,false);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1122,21 +1135,23 @@ public class TaxiDomain implements DomainGenerator{
         taxiLocations.add(l2);
         taxiLocations.add(l3);
 
-        TaxiLocation tempStartLocation = taxiLocations.get(rand.nextInt(taxiLocations.size()));
-        TaxiLocation tempGoalLocation = taxiLocations.get(rand.nextInt(taxiLocations.size()));
+//        TaxiLocation tempStartLocation = taxiLocations.get(rand.nextInt(taxiLocations.size()));
+//        TaxiLocation tempGoalLocation = taxiLocations.get(rand.nextInt(taxiLocations.size()));
 
 
-        TaxiPassenger p1 = new TaxiPassenger(PASSENGERCLASS+0,tempStartLocation.x, tempStartLocation.y, tempGoalLocation.colour, tempStartLocation.colour);
+        TaxiPassenger p1 = new TaxiPassenger(PASSENGERCLASS+0,l0.x, l0.y, l3.colour, l3.colour);
         taxiPassengers.add(p1);
 
-        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,false);
-        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,false);
 
         TaxiMapWall v1 = new TaxiMapWall(WALLCLASS+0,0, 5, 0,true);
         TaxiMapWall v2 = new TaxiMapWall(WALLCLASS+1,0, 5, 5,true);
         TaxiMapWall v3 = new TaxiMapWall(WALLCLASS+2,0, 2, 1,true);
         TaxiMapWall v4 = new TaxiMapWall(WALLCLASS+3,3, 5, 2,true);
         TaxiMapWall v5 = new TaxiMapWall(WALLCLASS+4,0, 2, 3,true);
+
+
+        TaxiMapWall h1 = new TaxiMapWall(WALLCLASS+5,0, 5, 0,false);
+        TaxiMapWall h2 = new TaxiMapWall(WALLCLASS+6,0, 5, 5,false);
 
         List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
         walls.add(h1);
@@ -1192,8 +1207,10 @@ public class TaxiDomain implements DomainGenerator{
         SimpleHashableStateFactory shf = new SimpleHashableStateFactory(false);
 
 
-        BoundedRTDP planner = new BoundedRTDP(td, discount ,shf,
-                new ConstantValueFunction(0.), new ConstantValueFunction(1.),0.1,-1);
+        ValueIteration planner  =new ValueIteration(td,1.,new SimpleHashableStateFactory(),0.1,100);
+
+//        BoundedRTDP planner = new BoundedRTDP(td, discount ,shf,
+//                new ConstantValueFunction(0.), new ConstantValueFunction(1.),0.1,-1);
 
         State startState1 = TaxiDomain.getRandomClassicState(rand, td, false);
         Policy policy = planner.planFromState(startState1);

@@ -99,4 +99,22 @@ public class TaxiAgent implements ObjectInstance{
     public String toString() {
         return OOStateUtilities.objectInstanceToString(this);
     }
+
+    @Override
+    public boolean equals(Object object){
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof TaxiAgent) {
+            TaxiAgent taxiObject = (TaxiAgent) object;
+            if((this.taxiOccupied==taxiObject.taxiOccupied && this.fuel==taxiObject.fuel && this.x==taxiObject.x && this.y==taxiObject.y && this.name.equals(taxiObject.name))){
+                return true;
+            }
+        }
+
+        return false;
+
+
+    }
+
 }
