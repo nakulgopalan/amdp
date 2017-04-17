@@ -170,24 +170,8 @@ public class TaxiState implements MutableOOState{
             return new ArrayList<ObjectInstance>(passengers);
         }
         else if(oclass.equals(TaxiDomain.WALLCLASS)){
-//            List<ObjectInstance> hWallObjects = new ArrayList<ObjectInstance>();
-//            for(TaxiMapWall w:walls){
-//                if(!w.verticalWall){
-//                    hWallObjects.add(w);
-//                }
-//            }
-//            return hWallObjects;
             return new ArrayList<ObjectInstance>(walls);
         }
-//        else if(oclass.equals(TaxiDomain.VWALLCLASS)){
-//            List<ObjectInstance> vWallObjects = new ArrayList<ObjectInstance>();
-//            for(TaxiMapWall w:walls){
-//                if(w.verticalWall){
-//                    vWallObjects.add(w);
-//                }
-//            }
-//            return vWallObjects;
-//        }
 
         throw new RuntimeException("Unknown class type " + oclass);
     }
@@ -330,6 +314,37 @@ public class TaxiState implements MutableOOState{
     @Override
     public String toString() {
         return OOStateUtilities.ooStateToString(this);
+    }
+
+
+    @Override
+    public boolean equals(Object object){
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof TaxiState) {
+            TaxiState taxiState = (TaxiState) object;
+            if(!taxiState.taxi.equals(this.taxi)){
+                return false;
+            }
+            for(TaxiPassenger thisP : this.passengers){
+                if(!taxiState.passengers.contains(thisP)) {
+                    return false;
+                }
+            }
+            for(TaxiLocation thisL : this.locations){
+                if(!taxiState.locations.contains(thisL)) {
+                    return false;
+                }
+            }
+            for(TaxiMapWall thisW : this.walls){
+                if(!taxiState.walls.contains(thisW)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public TaxiAgent touchTaxi(){

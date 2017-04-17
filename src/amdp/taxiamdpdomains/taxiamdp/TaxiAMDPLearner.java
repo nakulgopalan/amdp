@@ -79,7 +79,7 @@ public class TaxiAMDPLearner {
         boolean randomStart = true;
         boolean singlePassenger = true;
 
-        bellmanBudget.setValue(4000);
+        bellmanBudget.setValue(-1);
 
 //        for(int i =0;i<args.length;i++){
 //            String str = args[i];
@@ -238,7 +238,8 @@ public class TaxiAMDPLearner {
         Visualizer v = TaxiVisualizer.getVisualizer(5, 5);
         List<Episode> eaList = new ArrayList<Episode>();
 
-        startState = TaxiDomain.getStartStateFromTaxiPosition(3,3,rand,td,false);
+//        startState = TaxiDomain.getStartStateFromTaxiPosition(3,3,rand,td,false);
+//        startState = TaxiDomain.getRandomClassicState(rand,td,false);
 
         StateEnumerator se = new StateEnumerator(((NonPrimitiveTaskNode) navigateTaskNode).domain(),new SimpleHashableStateFactory());
         se.findReachableStatesAndEnumerate(startState);
@@ -246,40 +247,48 @@ public class TaxiAMDPLearner {
         List<ActionType> atType = ((NonPrimitiveTaskNode) navigateTaskNode).getDomain().getActionTypes();
 
         HashMap<State,HashMap<String, ArrayList<TransitionProb>>> transitionTableWhenWorking = new HashMap<>();
+        HashMap<State,HashMap<String, Double>> rewardTableWhenWorking = new HashMap<>();
 
         HashMap<State,HashMap<String, ArrayList<TransitionProb>>> transitionTableWhenNotWorking = new HashMap<>();
+        HashMap<State,HashMap<String, Double>> rewardTableWhenNotWorking = new HashMap<>();
 
 
-        for(int i=0;i<52;i++) {
+        for(int i=0;i<100;i++) {
 
 //            startState = TaxiDomain.getRandomClassicState(rand, td, false);
             SimulatedEnvironment envN = new SimulatedEnvironment(tdEnv, startState);
 
-            if(i==25){
-                FactoredTabularModel model = taskNameToModelMap.get(navigateTaskNode.getName());
-                for(int j=0;j<se.numStatesEnumerated();j++){
-                    State s = se.getStateForEnumerationId(j);
-                    for(ActionType at:atType){
-                        List<Action> actionList = at.allApplicableActions(s);
-                        if(actionList.size()==0){
-                            continue;
-                        }
-
-                        Action a = actionList.get(0);
-                        List<TransitionProb> tempTPList = model.transitions(s,a);
-
-                        if(!transitionTableWhenWorking.containsKey(s)){
-                            transitionTableWhenWorking.put(s, new HashMap<String, ArrayList<TransitionProb>>());
-                        }
-                        if(!transitionTableWhenWorking.get(s).containsKey(a.actionName())){
-                            transitionTableWhenWorking.get(s).put(a.actionName(), new ArrayList<TransitionProb>());
-                        }
-                        transitionTableWhenWorking.get(s).get(a.actionName()).addAll(tempTPList);
-
-                    }
-
-                }
-            }
+//            if(i==45){
+//                FactoredTabularModel model = taskNameToModelMap.get(navigateTaskNode.getName());
+//                for(int j=0;j<se.numStatesEnumerated();j++){
+//                    State s = se.getStateForEnumerationId(j);
+//                    for(ActionType at:atType){
+//                        List<Action> actionList = at.allApplicableActions(s);
+//                        if(actionList.size()==0){
+//                            continue;
+//                        }
+//
+//                        Action a = actionList.get(0);
+//                        List<TransitionProb> tempTPList = model.transitions(s,a);
+//
+//                        if(!transitionTableWhenWorking.containsKey(s)){
+//                            transitionTableWhenWorking.put(s, new HashMap<String, ArrayList<TransitionProb>>());
+//                        }
+//                        if(!transitionTableWhenWorking.get(s).containsKey(a.actionName())){
+//                            transitionTableWhenWorking.get(s).put(a.actionName(), new ArrayList<TransitionProb>());
+//                        }
+//                        transitionTableWhenWorking.get(s).get(a.actionName()).addAll(tempTPList);
+//
+//                        if(!rewardTableWhenWorking.containsKey(s)){
+//                            rewardTableWhenWorking.put(s, new HashMap<String, Double>());
+//                        }
+//
+//                        rewardTableWhenWorking.get(s).put(a.actionName(), model.sample(s,a).r);
+//
+//                    }
+//
+//                }
+//            }
 
 
             Episode e = agent.runLearningEpisode(envN, 100);
@@ -292,60 +301,81 @@ public class TaxiAMDPLearner {
         }
 
 
-        FactoredTabularModel model = taskNameToModelMap.get(navigateTaskNode.getName());
-        for(int j=0;j<se.numStatesEnumerated();j++){
-            State s = se.getStateForEnumerationId(j);
-            for(ActionType at:atType){
-                List<Action> actionList = at.allApplicableActions(s);
-                if(actionList.size()==0){
-                    continue;
-                }
-
-                Action a = actionList.get(0);
-                List<TransitionProb> tempTPList = model.transitions(s,a);
-
-                if(!transitionTableWhenNotWorking.containsKey(s)){
-                    transitionTableWhenNotWorking.put(s, new HashMap<String, ArrayList<TransitionProb>>());
-                }
-                if(!transitionTableWhenNotWorking.get(s).containsKey(a.actionName())){
-                    transitionTableWhenNotWorking.get(s).put(a.actionName(), new ArrayList<TransitionProb>());
-                }
-                transitionTableWhenNotWorking.get(s).get(a.actionName()).addAll(tempTPList);
-
-            }
-
-        }
-
-        for(int i=0;i<se.numStatesEnumerated();i++){
-
-            State s = se.getStateForEnumerationId(i);
-            for(ActionType at:atType){
-                List<Action> actionList = at.allApplicableActions(s);
-                if(actionList.size()==0){
-                    continue;
-                }
-
-                Action a = actionList.get(0);
+//        FactoredTabularModel model = taskNameToModelMap.get(navigateTaskNode.getName());
+//        for(int j=0;j<se.numStatesEnumerated();j++){
+//            State s = se.getStateForEnumerationId(j);
+//            for(ActionType at:atType){
+//                List<Action> actionList = at.allApplicableActions(s);
+//                if(actionList.size()==0){
+//                    continue;
+//                }
+//
+//                Action a = actionList.get(0);
 //                List<TransitionProb> tempTPList = model.transitions(s,a);
+//
+//                if(!transitionTableWhenNotWorking.containsKey(s)){
+//                    transitionTableWhenNotWorking.put(s, new HashMap<String, ArrayList<TransitionProb>>());
+//                }
+//                if(!transitionTableWhenNotWorking.get(s).containsKey(a.actionName())){
+//                    transitionTableWhenNotWorking.get(s).put(a.actionName(), new ArrayList<TransitionProb>());
+//                }
+//                transitionTableWhenNotWorking.get(s).get(a.actionName()).addAll(tempTPList);
+//
+//                if(!rewardTableWhenNotWorking.containsKey(s)){
+//                    rewardTableWhenNotWorking.put(s, new HashMap<String, Double>());
+//                }
+//
+//                rewardTableWhenNotWorking.get(s).put(a.actionName(), model.sample(s,a).r);
+//
+//            }
+//
+//        }
 
-                if(!transitionTableWhenNotWorking.containsKey(s)){
-                    continue;
-                }
-                if(!transitionTableWhenNotWorking.get(s).containsKey(a.actionName())){
-                    continue;
-                }
-                for(int j=0;j<transitionTableWhenNotWorking.get(s).get(a.actionName()).size();j++) {
-                    if(!transitionTableWhenWorking.get(s).get(a.actionName()).get(j).eo.op.equals(transitionTableWhenNotWorking.get(s).get(a.actionName()).get(j).eo.op)) {
-                        System.out.println("-------------------------------------------------------------------------------------------");
-                        System.out.println(transitionTableWhenWorking.get(s).get(a.actionName()).get(j).eo.op);
-                        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                        System.out.println(transitionTableWhenNotWorking.get(s).get(a.actionName()).get(j).eo.op);
-                    }
-                }
-
-            }
-
-        }
+//        for(int i=0;i<se.numStatesEnumerated();i++){
+//
+//            State s = se.getStateForEnumerationId(i);
+//            for(ActionType at:atType){
+//                List<Action> actionList = at.allApplicableActions(s);
+//                if(actionList.size()==0){
+//                    continue;
+//                }
+//
+//                Action a = actionList.get(0);
+////                List<TransitionProb> tempTPList = model.transitions(s,a);
+//
+//                if(!transitionTableWhenNotWorking.containsKey(s)){
+//                    continue;
+//                }
+//                if(!transitionTableWhenNotWorking.get(s).containsKey(a.actionName())){
+//                    continue;
+//                }
+//                for(int j=0;j<transitionTableWhenNotWorking.get(s).get(a.actionName()).size();j++) {
+//                    if(!transitionTableWhenWorking.get(s).get(a.actionName()).get(j).eo.op.equals(transitionTableWhenNotWorking.get(s).get(a.actionName()).get(j).eo.op)) {
+//                        System.out.println("-------------------------------------------------------------------------------------------");
+//                        System.out.println("///////////////////////////////////!!!transitions!!!!///////////////////////////////////////////////");
+//                        System.out.println("original state: " + s);
+//                        System.out.println("action taken: " + a.actionName());
+//                        System.out.println("-------------------------------------------------------------------------------------------");
+//                        System.out.println(transitionTableWhenWorking.get(s).get(a.actionName()).get(j).eo.op);
+//                        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+//                        System.out.println(transitionTableWhenNotWorking.get(s).get(a.actionName()).get(j).eo.op);
+//                    }
+//
+//                    if(!rewardTableWhenWorking.get(s).get(a.actionName()).equals(rewardTableWhenNotWorking.get(s).get(a.actionName()))) {
+//                        System.out.println("-------------------------------------------------------------------------------------------");
+//                        System.out.println("//////////////////////////////!!!reward!!!!///////////////////////////////////");
+//                        System.out.println("original state: " + s);
+//                        System.out.println("action taken: " + a.actionName());
+//                        System.out.println("-------------------------------------------------------------------------------------------");
+//                        System.out.println(rewardTableWhenWorking.get(s).get(a.actionName()));
+//                        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+//                        System.out.println(rewardTableWhenNotWorking.get(s).get(a.actionName()));
+//                    }
+//                }
+//
+//            }
+//
+//        }
 
 
         int count = 0;
