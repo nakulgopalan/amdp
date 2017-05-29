@@ -127,12 +127,7 @@ public class AMDPLearningAgent implements LearningAgent{
         State s = StateStack.get(level);
         List<Double> rewardList  = new ArrayList<>();
 
-
-
-
         if(level !=0){
-
-
             while(!gt.terminalFunction().isTerminal(s) && (stepCount < maxSteps || maxSteps == -1)){
                 Policy pi = ModelLearners.get(level).generatePolicy(s, gt);
                 State startState = s.copy();

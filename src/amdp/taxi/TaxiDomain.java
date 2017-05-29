@@ -1,8 +1,27 @@
 package amdp.taxi;
 
-import amdp.taxi.state.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.ApplicationFrame;
+
+import amdp.taxi.state.TaxiAgent;
+import amdp.taxi.state.TaxiLocation;
+import amdp.taxi.state.TaxiMapWall;
+import amdp.taxi.state.TaxiPassenger;
+import amdp.taxi.state.TaxiState;
 import amdp.utilities.BoltzmannQPolicyWithCoolingSchedule;
-import burlap.behavior.policy.*;
+import burlap.behavior.policy.GreedyQPolicy;
+import burlap.behavior.policy.Policy;
+import burlap.behavior.policy.PolicyUtils;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.auxiliary.EpisodeSequenceVisualizer;
 import burlap.behavior.singleagent.learning.tdmethods.QLearning;
@@ -30,18 +49,6 @@ import burlap.mdp.singleagent.model.statemodel.FullStateModel;
 import burlap.mdp.singleagent.oo.OOSADomain;
 import burlap.statehashing.simple.SimpleHashableStateFactory;
 import burlap.visualizer.Visualizer;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.ApplicationFrame;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 
 /**
@@ -944,7 +951,7 @@ public class TaxiDomain implements DomainGenerator{
 
 
 
-    public static State getClassicState(Domain domain, boolean usesFuel){
+    public static State getClassicState(boolean usesFuel){
 
         TaxiAgent taxiAgent = new TaxiAgent(TAXICLASS+0,0,3);
 
@@ -1056,7 +1063,7 @@ public class TaxiDomain implements DomainGenerator{
 
     }
 
-    public static State getRandomClassicState(Random rand, Domain domain, boolean usesFuel){
+    public static State getRandomClassicState(Random rand, boolean usesFuel){
 
         TaxiAgent taxiAgent = new TaxiAgent(TAXICLASS+0, rand.nextInt(maxX),rand.nextInt(maxY));
 
@@ -1113,7 +1120,7 @@ public class TaxiDomain implements DomainGenerator{
 
     }
 
-    public static State getStartStateFromTaxiPosition(int TaxiX, int TaxiY, Random rand, Domain domain, boolean usesFuel){
+    public static State getStartStateFromTaxiPosition(int TaxiX, int TaxiY, Random rand, boolean usesFuel){
 
         TaxiAgent taxiAgent = new TaxiAgent(TAXICLASS+0, TaxiX, TaxiY);
 
@@ -1170,7 +1177,56 @@ public class TaxiDomain implements DomainGenerator{
 
     }
 
+    public static State getSmallClassicState(boolean usesFuel){
 
+        TaxiAgent taxiAgent = new TaxiAgent(TAXICLASS+0,0,0);
+
+        TaxiPassenger p1 = new TaxiPassenger(PASSENGERCLASS+0, 0, 1, RED, BLUE);
+
+        TaxiLocation l0 = new TaxiLocation(0, 0,LOCATIONCLASS+0,YELLOW);
+        TaxiLocation l1 = new TaxiLocation(0, 2,LOCATIONCLASS+1,RED);
+        TaxiLocation l2 = new TaxiLocation(0, 1,LOCATIONCLASS+2,BLUE);
+        TaxiLocation l3 = new TaxiLocation(0, 3,LOCATIONCLASS+3,GREEN);
+
+        List<TaxiLocation> taxiLocations = new ArrayList<TaxiLocation>();
+        List<TaxiPassenger> taxiPassengers= new ArrayList<TaxiPassenger>();
+
+        if(usesFuel){
+            TaxiLocation lFuel = new TaxiLocation(2,1,LOCATIONCLASS+4,FUEL);
+            taxiLocations.add(lFuel);
+        }
+        taxiLocations.add(l0);
+        taxiLocations.add(l1);
+        taxiLocations.add(l2);
+        taxiLocations.add(l3);
+
+        taxiPassengers.add(p1);
+
+        TaxiMapWall wall0 = new TaxiMapWall(WALLCLASS+0,0, 5, 0, false);
+        TaxiMapWall wall1 = new TaxiMapWall(WALLCLASS+1,0, 5, 5, false);
+        TaxiMapWall wall2 = new TaxiMapWall(WALLCLASS+2,0, 5, 0, true);
+        TaxiMapWall wall3 = new TaxiMapWall(WALLCLASS+3,0, 5, 5, true);
+        TaxiMapWall wall4 = new TaxiMapWall(WALLCLASS+4,0, 5, 1, true);
+        TaxiMapWall wall5 = new TaxiMapWall(WALLCLASS+5,3, 5, 2, true);
+        TaxiMapWall wall6 = new TaxiMapWall(WALLCLASS+6,0, 2, 3, true);
+
+        List<TaxiMapWall> walls = new ArrayList<TaxiMapWall>();
+        walls.add(wall0);
+        walls.add(wall1);
+        walls.add(wall2);
+        walls.add(wall3);
+        walls.add(wall4);
+        walls.add(wall5);
+        walls.add(wall6);
+
+
+        State s = new TaxiState(walls,taxiPassengers,taxiLocations,taxiAgent);
+
+
+        return s;
+
+    
+    }
 
 
 
@@ -1212,7 +1268,7 @@ public class TaxiDomain implements DomainGenerator{
 //        BoundedRTDP planner = new BoundedRTDP(td, discount ,shf,
 //                new ConstantValueFunction(0.), new ConstantValueFunction(1.),0.1,-1);
 
-        State startState1 = TaxiDomain.getRandomClassicState(rand, td, false);
+        State startState1 = TaxiDomain.getRandomClassicState(rand, false);
         Policy policy = planner.planFromState(startState1);
         Episode episode = PolicyUtils.rollout(policy, startState1, td.getModel());
 
@@ -1221,7 +1277,7 @@ public class TaxiDomain implements DomainGenerator{
 
 
         if(false) {
-            State s = TaxiDomain.getRandomClassicState(rand, td, false);
+            State s = TaxiDomain.getRandomClassicState(rand, false);
             BoundedRTDP brtdp = new BoundedRTDP(td, discount, shf,
                     new ConstantValueFunction(0.),
                     new ConstantValueFunction(1.),
@@ -1282,7 +1338,7 @@ public class TaxiDomain implements DomainGenerator{
                 for(int starty = 0;starty<maxY;starty++){
 //            int startx =0;
 //            int starty =0;
-                    State startState = getStartStateFromTaxiPosition(startx,starty, rand, td, false);
+                    State startState = getStartStateFromTaxiPosition(startx,starty, rand, false);
 //            State startStateClassic = getClassicState(td, false);
 //            ObjectInstance location = ((TaxiState)startState).locations.get(3);
 //            System.out.println(((TaxiLocation)location).colour);
@@ -1326,10 +1382,10 @@ public class TaxiDomain implements DomainGenerator{
 
             int count2=0;
             double sum2 =0.;
-            State exampleStartState = getStartStateFromTaxiPosition(0,0, rand, td, false);
+            State exampleStartState = getStartStateFromTaxiPosition(0,0, rand, false);
             for(ObjectInstance locationStart:((TaxiState)exampleStartState).locations ){
 
-                State startState = getStartStateFromTaxiPosition(((TaxiLocation)locationStart).x,((TaxiLocation)locationStart).y, rand, td, false);
+                State startState = getStartStateFromTaxiPosition(((TaxiLocation)locationStart).x,((TaxiLocation)locationStart).y, rand, false);
 //            ObjectInstance location = ((TaxiState)startState).locations.get(3);
 //            System.out.println(((TaxiLocation)location).colour);
                 for(ObjectInstance endLocation:((TaxiState)startState).locations ){
@@ -1391,7 +1447,7 @@ public class TaxiDomain implements DomainGenerator{
 
 
             for (int i = 0; i < numberOfTests; i++) {
-                State s = TaxiDomain.getRandomClassicState(rand, td, false);
+                State s = TaxiDomain.getRandomClassicState(rand, false);
 //                SimulatedEnvironment env = new SimulatedEnvironment(td, s);
                 List<Episode> episodesQ = new ArrayList<Episode>();
 //                QLearning q = new QLearning(td, 0.95, new SimpleHashableStateFactory(), 0.123, 0.35);
@@ -1405,7 +1461,7 @@ public class TaxiDomain implements DomainGenerator{
                 for (int j = 1; j <= numberOfLearningEpisodes; j++) {
                     System.out.println("test: " +i+", "+ "learning episode: " + j);
                     System.out.println("-------------------------------------------------------------");
-                    State sNew = TaxiDomain.getRandomClassicState(rand, td, false);
+                    State sNew = TaxiDomain.getRandomClassicState(rand, false);
                     SimulatedEnvironment envN = new SimulatedEnvironment(td, sNew);
                     Episode ea = q.runLearningEpisode(envN);
                     episodesQ.add(ea);
