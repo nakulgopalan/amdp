@@ -1,7 +1,9 @@
 package amdp.taxi.hierarcchyResults;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import amdp.amdpframework.AMDPModelLearner;
 import amdp.amdpframework.GroundedTask;
@@ -98,10 +100,10 @@ public class TaxiAMDPHierarchy {
         FactoredTabularModel putDownL1Model = new FactoredTabularModel(((NonPrimitiveTaskNode)putDownL1TaskNode).getDomain(),new SimpleHashableStateFactory(),5);
         FactoredTabularModel pickUpL1Model = new FactoredTabularModel(((NonPrimitiveTaskNode)pickupL1TaskNode).getDomain(),new SimpleHashableStateFactory(),5);
 
-
-//        taskNameToModelMap.put(navigateTaskNode.getName(),navModel);
-//        taskNameToModelMap.put(putDownL1TaskNode.getName(),putDownL1Model);
-//        taskNameToModelMap.put(pickupL1TaskNode.getName(),pickUpL1Model);
+        Map<String, FactoredTabularModel> taskNameToModelMap = new HashMap<>();
+        taskNameToModelMap.put(navigateTaskNode.getName(),navModel);
+        taskNameToModelMap.put(putDownL1TaskNode.getName(),putDownL1Model);
+        taskNameToModelMap.put(pickupL1TaskNode.getName(),pickUpL1Model);
 
         TaskNode[] getSubTasks = new TaskNode[]{navigateTaskNode, pickupL1TaskNode};
         TaskNode[] putSubTasks = new TaskNode[]{navigateTaskNode, putDownL1TaskNode};
@@ -115,8 +117,7 @@ public class TaxiAMDPHierarchy {
         TaskNode root = new RootTaskNode("root",rootSubTasks,tdL2, tfL2,rfL2);
         
         pgList = new ArrayList<AMDPModelLearner>();
-        FactoredTabularModel sharedModel = new FactoredTabularModel(td,new SimpleHashableStateFactory(),5);
-        pgList.add(0,new l0PolicyGenerator(td, sharedModel,5));
+        pgList.add(0,new l0PolicyGenerator(td, 5, taskNameToModelMap));
         pgList.add(1,new l1PolicyGenerator(tdL1));
         pgList.add(2,new l2PolicyGenerator(tdL2));
         

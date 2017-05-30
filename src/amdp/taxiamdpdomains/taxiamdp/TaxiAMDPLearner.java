@@ -512,15 +512,16 @@ public class TaxiAMDPLearner {
 
         //        private OOSADomain l0;
         private final double discount = 0.99;
-        private FactoredTabularModel sharedModel;
+//        private FactoredTabularModel sharedModel;
         HashMap<GroundedTask, FactoredTabularModel> gtModel = new HashMap<>();
 
 //        FactoredTabularModel sharedModel;
 //        RMaxModel sharedRMaxModel;
         int nconf;
 
-        public l0PolicyGenerator(OOSADomain l0In, FactoredTabularModel sharedModel, int nconf){
-            this.sharedModel = sharedModel;
+        public l0PolicyGenerator(OOSADomain l0In, int nconf, Map<String, FactoredTabularModel> nameModelMap){
+        	taskNameToModelMap = nameModelMap;
+//            this.sharedModel = sharedModel;
 
 //            sharedRMaxModel = new RMaxModel(sharedModel,pf,1.,l0In.getActionTypes());
             this.nconf = nconf;
@@ -530,10 +531,8 @@ public class TaxiAMDPLearner {
         public Policy generatePolicy(State s, GroundedTask gt) {
 
             OOSADomain l0 = gt.groundedDomain();
-
-
-
             if(!groundedTaskToSolverMap.containsKey(gt)){
+                FactoredTabularModel sharedModel = taskNameToModelMap.get(gt.getT().getName());
                 FactoredTabularModel ft = new FactoredTabularModel(gt.groundedDomain(),new SimpleHashableStateFactory(),nconf,sharedModel.getStateNodes());
 //                taskNameToModelMap.put(gt,ft);
 

@@ -121,8 +121,6 @@ public class AMDPLearningAgent implements LearningAgent{
         return ea;
     }
 
-
-
     protected List<Double> decompose(Environment env, int level, GroundedTask gt, int maxSteps, Episode ea){
         State s = StateStack.get(level);
         List<Double> rewardList  = new ArrayList<>();
